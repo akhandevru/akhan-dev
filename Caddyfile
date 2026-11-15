@@ -21,7 +21,7 @@ www.{$DOMAIN:localhost} {
 	header @hashed Cache-Control "public, max-age=31536000, immutable"
 
 	# Превью, иконки и манифест: кеш на сутки, чтобы замена файла доходила быстро.
-	@static path /og.png /favicon.svg /favicon-48.png /apple-touch-icon.png /icon-192.png /icon-512.png /site.webmanifest
+	@static path /og.jpg /favicon.svg /favicon-48.png /apple-touch-icon.png /icon-192.png /icon-512.png /site.webmanifest
 	header @static Cache-Control "public, max-age=86400"
 
 	file_server

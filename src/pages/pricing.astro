@@ -7,12 +7,22 @@ const { pricingFactors: factors, pricingFaq: faq, pricingCalc: calc } = content.
 /** Первое число из строки цены: «от 15 000 ₽» даёт 15000. */
 const amount = (price: string) => Number(price.replace(/[^\d]/g, '')) || 0;
 const [single, multi, bot, admin] = pricing.items;
-const sites = [single, multi].filter(item => item !== undefined).map(item => ({ title: item.title, value: amount(item.price) }));
-const addons = [bot, admin].filter(item => item !== undefined).map(item => ({ title: item.title, value: amount(item.price), price: item.price }));
-const format = (value: number) => `от ${value.toLocaleString('ru-RU')} ₽`;
-const initial = sites[0]?.value ?? 0;
+const format = (value: number) => `${value.toLocaleString('ru-RU')} ₽`;
+const firstPage = calc.pageTiers[0]?.price ?? 0;
+// Данные калькулятора берутся из тех же цен, что на карточках выше, поэтому расходиться они не могут.
+const config = {
+  prices: { single: amount(single?.price ?? ''), multi: amount(multi?.price ?? ''), bot: amount(bot?.price ?? ''), admin: amount(admin?.price ?? '') },
+  names: { single: single?.title ?? '', multi: multi?.title ?? '', bot: bot?.title ?? '', admin: admin?.title ?? '' },
+  tiers: calc.pageTiers, maxPages: calc.maxPages, singleSitePages: calc.singleSitePages,
+  words: calc.pagesWord, pagesLabel: calc.pagesLabel,
+  messages: { switched: calc.switched, trimmed: calc.trimmed, empty: calc.empty },
+};
+const faqSchema = {
+  '@type': 'FAQPage',
+  mainEntity: faq.items.map(item => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })),
+};
 ---
-<SectionPage page="pricing" name={pricing.title} path="/pricing/">
+<SectionPage page="pricing" name={pricing.title} path="/pricing/" schema={[faqSchema]}>
   <header class="wrap page-head">
     <h1>{pricing.title}</h1>
     <p>{pricing.description}</p>
@@ -33,25 +43,44 @@ const initial = sites[0]?.value ?? 0;
     <p class="plans-note">{pricing.note}</p>
   </section>
 
-  <section class="section wrap" aria-labelledby="calc-heading">
-    <div class="calc" data-calc>
+  <section class="section wrap" id="calculator" aria-labelledby="calc-heading">
+    <div class="calc" data-calc data-config={JSON.stringify(config)}>
       <div>
         <h2 class="extra-title" id="calc-heading">{calc.title}</h2>
         <p class="extra-intro">{calc.description}</p>
+
         <fieldset>
-          <legend>{calc.siteLabel}</legend>
-          <label class="option"><input type="radio" name="site" value="0" /><span>{calc.siteNone}</span></label>
-          {sites.map((site, index) => <label class="option"><input type="radio" name="site" value={site.value} checked={index === 0} /><span>{site.title}</span><span class="option-price">{format(site.value)}</span></label>)}
+          <legend>{calc.mainLabel}</legend>
+          <div role="radiogroup" aria-label={calc.siteLabel}>
+            <label class="option"><input type="radio" name="site" value="single" checked /><span>{single?.title}</span><span class="option-price">от {format(config.prices.single)}</span></label>
+            <label class="option"><input type="radio" name="site" value="multi" /><span>{multi?.title}</span><span class="option-price">от {format(config.prices.multi)}</span></label>
+          </div>
+          <label class="option"><input type="checkbox" name="bot" /><span>{bot?.title}</span><span class="option-price">от {format(config.prices.bot)}</span></label>
         </fieldset>
+
         <fieldset>
           <legend>{calc.extrasLabel}</legend>
-          {addons.map(addon => <label class="option"><input type="checkbox" name="addon" value={addon.value} /><span>{addon.title}</span><span class="option-price">{addon.price}</span></label>)}
+          <label class="option"><input type="checkbox" name="admin" /><span>{admin?.title}</span><span class="option-price">от {format(config.prices.admin)}</span></label>
+          <div class="option pages">
+            <span id="pages-label">{calc.pagesLabel}</span>
+            <span class="option-price">от {format(firstPage)}</span>
+            <div class="stepper" role="group" aria-labelledby="pages-label">
+              <button type="button" data-pages-minus aria-label={calc.pagesLess} disabled><span class="chev chev-prev" aria-hidden="true"></span></button>
+              <output data-pages-value aria-live="polite">0</output>
+              <button type="button" data-pages-plus aria-label={calc.pagesMore}><span class="chev chev-next" aria-hidden="true"></span></button>
+            </div>
+          </div>
+          <p class="calc-hint">{calc.adminHint} {calc.pagesRule}</p>
         </fieldset>
+        <p class="calc-notice" role="status" data-calc-notice></p>
       </div>
+
       <div class="calc-result">
         <p class="calc-label" id="calc-label">{calc.resultLabel}</p>
-        <p class="calc-sum" aria-labelledby="calc-label" aria-live="polite" data-calc-sum data-empty={calc.empty}>{format(initial)}</p>
-        <a class="calc-action" href={siteConfig.telegram} target="_blank" rel="noopener noreferrer">{calc.action}</a>
+        <p class="calc-sum" aria-labelledby="calc-label" data-calc-sum>от {format(config.prices.single)}</p>
+        <ul class="calc-lines" aria-label={calc.breakdownLabel} data-calc-lines><li><span>{single?.title}</span><span>{format(config.prices.single)}</span></li></ul>
+        <a class="calc-action" href="/contact/#message" data-calc-action>{calc.action}</a>
+        <p class="calc-disclaimer">{calc.disclaimer}</p>
       </div>
     </div>
   </section>
@@ -72,17 +101,86 @@ const initial = sites[0]?.value ?? 0;
 </SectionPage>
 
 <script>
-  // Сумма стартовых цен отмеченных услуг. Без JS видна сумма для выбора по умолчанию.
+  // Калькулятор: сайт и бот это основное, админка и страницы дополнения. Цена страницы падает с их числом.
+  // Правила: больше страниц, чем помещается в одностраничный сайт, значит многостраничный (он выбирается сам).
+  // Расчёт сохраняется в sessionStorage, чтобы страница контактов подставила его в заявку.
+  interface Tier { from: number; price: number }
+  type Key = 'single' | 'multi' | 'bot' | 'admin';
+  interface Config {
+    prices: Record<Key, number>; names: Record<Key, string>;
+    tiers: Tier[]; maxPages: number; singleSitePages: number; words: string[]; pagesLabel: string;
+    messages: { switched: string; trimmed: string; empty: string };
+  }
   const root = document.querySelector<HTMLElement>('[data-calc]');
-  const sum = root?.querySelector<HTMLElement>('[data-calc-sum]');
-  if (root && sum) {
-    const update = () => {
-      const total = [...root.querySelectorAll<HTMLInputElement>('input:checked')].reduce((acc, input) => acc + Number(input.value), 0);
-      sum.textContent = total > 0 ? `от ${total.toLocaleString('ru-RU')} ₽` : (sum.dataset['empty'] ?? '');
-      sum.classList.toggle('is-empty', total === 0);
-    };
-    root.addEventListener('change', update);
-    update();
+  if (root?.dataset['config']) {
+    const cfg = JSON.parse(root.dataset['config']) as Config;
+    const sumEl = root.querySelector<HTMLElement>('[data-calc-sum]');
+    const linesEl = root.querySelector<HTMLElement>('[data-calc-lines]');
+    const notice = root.querySelector<HTMLElement>('[data-calc-notice]');
+    const valueEl = root.querySelector<HTMLElement>('[data-pages-value]');
+    const minus = root.querySelector<HTMLButtonElement>('[data-pages-minus]');
+    const plus = root.querySelector<HTMLButtonElement>('[data-pages-plus]');
+    const radios = [...root.querySelectorAll<HTMLInputElement>('input[name="site"]')];
+    const botBox = root.querySelector<HTMLInputElement>('input[name="bot"]');
+    const adminBox = root.querySelector<HTMLInputElement>('input[name="admin"]');
+    if (sumEl && linesEl && notice && valueEl && minus && plus && botBox && adminBox) {
+      type Site = 'single' | 'multi';
+      let site: Site = 'single';
+      let pages = 0;
+      const money = (value: number) => `${value.toLocaleString('ru-RU')} ₽`;
+      const word = (n: number) => {
+        const [one = '', few = '', many = ''] = cfg.words;
+        const m100 = n % 100, m10 = n % 10;
+        return m100 >= 11 && m100 <= 14 ? many : m10 === 1 ? one : m10 >= 2 && m10 <= 4 ? few : many;
+      };
+      const pagePrice = (n: number) => cfg.tiers.filter(tier => tier.from <= n).pop()?.price ?? 0;
+
+      const render = (message = '') => {
+        radios.forEach(radio => { radio.checked = radio.value === site; });
+        valueEl.textContent = String(pages);
+        minus.disabled = pages <= 0;
+        plus.disabled = pages >= cfg.maxPages;
+        notice.textContent = message;
+
+        const lines: [string, number][] = [];
+        lines.push([cfg.names[site], cfg.prices[site]]);
+        if (botBox.checked) lines.push([cfg.names.bot, cfg.prices.bot]);
+        if (adminBox.checked) lines.push([cfg.names.admin, cfg.prices.admin]);
+        if (pages > 0) lines.push([`${cfg.pagesLabel}: ${pages} ${word(pages)} по ${money(pagePrice(pages))}`, pages * pagePrice(pages)]);
+        const total = lines.reduce((acc, line) => acc + line[1], 0);
+        sumEl.textContent = total > 0 ? `от ${money(total)}` : cfg.messages.empty;
+        sumEl.classList.toggle('is-empty', total === 0);
+        linesEl.replaceChildren(...lines.map(([name, price]) => {
+          const li = document.createElement('li');
+          const label = document.createElement('span'); label.textContent = name;
+          const cost = document.createElement('span'); cost.textContent = money(price);
+          li.append(label, cost);
+          return li;
+        }));
+        try {
+          if (total > 0) sessionStorage.setItem('akhan-estimate', JSON.stringify({ lines, total }));
+          else sessionStorage.removeItem('akhan-estimate');
+        } catch { /* хранилище недоступно: расчёт просто не попадёт в заявку */ }
+      };
+
+      const setPages = (value: number) => {
+        pages = Math.min(cfg.maxPages, Math.max(0, value));
+        let message = '';
+        if (pages > cfg.singleSitePages && site !== 'multi') { site = 'multi'; message = cfg.messages.switched; }
+        render(message);
+      };
+      minus.addEventListener('click', () => setPages(pages - 1));
+      plus.addEventListener('click', () => setPages(pages + 1));
+      radios.forEach(radio => radio.addEventListener('change', () => {
+        site = radio.value as Site;
+        let message = '';
+        if (site === 'single' && pages > cfg.singleSitePages) { pages = cfg.singleSitePages; message = cfg.messages.trimmed; }
+        render(message);
+      }));
+      botBox.addEventListener('change', () => render());
+      adminBox.addEventListener('change', () => render());
+      render();
+    }
   }
 </script>
 
@@ -104,21 +202,42 @@ const initial = sites[0]?.value ?? 0;
   legend { margin-bottom:10px; padding:0; color:var(--muted); font:12px/1.6 var(--mono) }
   .option { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px; min-height:56px; padding-inline:4px; border-bottom:1px solid var(--line); cursor:pointer; font-size:17px }
   .option input { width:20px; height:20px; margin:0; accent-color:var(--text) }
-  .option-price { color:var(--secondary); font:13px var(--mono); white-space:nowrap }
   .option:has(input:checked) { font-weight:600 }
+  .option:has(input:disabled) { cursor:not-allowed; opacity:.55 }
+  .option-price { color:var(--secondary); font:13px var(--mono); white-space:nowrap }
+  .option.pages { grid-template-columns:1fr auto auto; cursor:default; padding-block:6px }
+  .stepper { display:inline-flex; align-items:center; gap:4px }
+  .stepper button { display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; padding:0; border:1.5px solid var(--line); border-radius:50%; background:transparent }
+  .stepper button:disabled { opacity:.4; cursor:not-allowed }
+  .stepper button:focus-visible { outline:2px solid var(--text); outline-offset:2px }
+  .stepper output { min-width:2.6ch; text-align:center; font:700 20px/1 var(--display); font-variant-numeric:tabular-nums }
+  /* Стрелка рисуется рамкой: левая и правая, без значков и картинок. */
+  .chev { display:block; width:10px; height:10px; border:solid currentColor; border-width:0 0 2px 2px }
+  .chev-prev { transform:translateX(2px) rotate(45deg) }
+  .chev-next { transform:translateX(-2px) rotate(-135deg) }
+  @media (hover:hover) { .stepper button:not(:disabled):hover { background:var(--text); border-color:var(--text); color:var(--bg) } }
+  .calc-hint { max-width:56ch; margin-top:14px; color:var(--secondary); font-size:14px; line-height:1.65 }
+  .calc-notice { min-height:1.65em; margin-top:12px; color:var(--text); font-size:14px; line-height:1.65 }
   .calc-result { position:sticky; top:calc(var(--hh) + 24px); display:grid; gap:16px; justify-items:start; padding:clamp(28px,3.4vw,52px); border-radius:var(--radius); background:var(--panel-bg); color:var(--panel-text) }
   .calc-label { color:var(--panel-muted); font:12px/1.6 var(--mono) }
   .calc-sum { font:800 clamp(36px,4.6vw,80px)/1 var(--display); letter-spacing:-.055em; font-variant-numeric:tabular-nums }
   .calc-sum.is-empty { font-size:clamp(20px,1.8vw,28px); letter-spacing:-.03em; color:var(--panel-muted) }
+  .calc-lines { display:grid; gap:8px; width:100%; padding-top:14px; border-top:1px solid var(--panel-line); font-size:15px; line-height:1.45 }
+  /* Строки создаёт скрипт, у них нет атрибута scoped-стилей Astro, поэтому :global. */
+  .calc-lines :global(li) { display:flex; justify-content:space-between; align-items:baseline; gap:16px }
+  .calc-lines :global(li span:last-child) { white-space:nowrap; font-variant-numeric:tabular-nums }
   .calc-action { display:inline-flex; align-items:center; min-height:52px; margin-top:8px; padding:12px 28px; border-radius:999px; background:var(--panel-text); color:var(--panel-bg); font:600 15px/1.2 var(--sans) }
   .calc-action:focus-visible { outline:2px solid var(--panel-text); outline-offset:4px }
+  .calc-disclaimer { color:var(--panel-muted); font-size:13px; line-height:1.55 }
   @media (hover:hover) {
     .calc-action { transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease }
     .calc-action:hover { background:transparent; color:var(--panel-text); box-shadow:inset 0 0 0 1.5px var(--panel-text) }
   }
 
+  /* Контурные слова. У переменного шрифта контуры внутри букв налегают друг на друга, и обычная обводка их показывает.
+     Поэтому обводка рисуется под заливкой (paint-order) двойной толщины, а заливка цвета фона закрывает всё внутри буквы. */
   .factors { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(28px,4vw,72px) }
-  .factors h3 { font:800 clamp(34px,3.2vw,58px)/1 var(--display); letter-spacing:-.06em; color:transparent; -webkit-text-stroke:1.5px var(--text) }
+  .factors h3 { font:800 clamp(34px,3.2vw,58px)/1 var(--display); letter-spacing:-.02em; color:var(--bg); -webkit-text-stroke:3px var(--text); paint-order:stroke fill; overflow-wrap:anywhere }
   .factors p { max-width:40ch; margin-top:18px; color:var(--secondary); font-size:16px; line-height:1.7 }
   .faq { border-top:1.5px solid var(--text) }
   .faq > div { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:12px clamp(24px,5vw,96px); padding-block:clamp(20px,2.6vw,36px); border-bottom:1.5px solid var(--line) }
@@ -130,10 +249,20 @@ const initial = sites[0]?.value ?? 0;
     .plan,.plan.wide { grid-column:auto }
   }
   @media (max-width:900px) {
-    .calc { grid-template-columns:1fr }
+    .calc { grid-template-columns:minmax(0,1fr) }
     .calc-result { position:static }
-    .factors { grid-template-columns:1fr }
-    .faq > div { grid-template-columns:1fr }
+    .factors { grid-template-columns:minmax(0,1fr) }
+    .faq > div { grid-template-columns:minmax(0,1fr) }
   }
-  @media (max-width:640px) { .plans { grid-template-columns:1fr } }
+  @media (max-width:640px) {
+    .plans { grid-template-columns:minmax(0,1fr) }
+    .option.pages { grid-template-columns:1fr auto }
+    .option.pages .option-price { grid-column:1; grid-row:2 }
+    .option.pages .stepper { grid-column:2; grid-row:1 / span 2 }
+  }
+  @media (max-width:420px) {
+    .option.pages { grid-template-columns:minmax(0,1fr) }
+    .option.pages .option-price,.option.pages .stepper { grid-column:1; grid-row:auto }
+    .option.pages .stepper { justify-self:start; margin-bottom:6px }
+  }
 </style>

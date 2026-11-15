@@ -101,9 +101,9 @@ const { aboutWork, aboutSite } = content.extras;
   .this-site p { max-width:56ch; color:var(--secondary); font-size:clamp(17px,1.4vw,20px); line-height:1.65 }
 
   @media (max-width:900px) {
-    .intro { grid-template-columns:1fr; align-items:start }
+    .intro { grid-template-columns:minmax(0,1fr); align-items:start }
     .me { width:min(100%,420px) }
     .prose { padding-left:0 }
-    .facts,.recent { grid-template-columns:1fr }
+    .facts,.recent { grid-template-columns:minmax(0,1fr) }
   }
 </style>

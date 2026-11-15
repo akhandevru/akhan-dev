@@ -42,12 +42,13 @@ const channels = [
     </div>
   </section>
 
-  <section class="section wrap builder-wrap" aria-labelledby="builder-heading">
+  <section class="section wrap builder-wrap" id="message" aria-labelledby="builder-heading">
     <div class="extra-head" data-rise>
       <h2 class="extra-title" id="builder-heading">{page.builderTitle}</h2>
       <p class="extra-intro">{page.builderDescription}</p>
+      <p class="estimate-note" role="status" data-estimate-note hidden>{page.estimateNote}</p>
     </div>
-    <form class="builder" data-builder>
+    <form class="builder" data-builder data-estimate-head={page.estimateHead} data-estimate-total={page.estimateTotal}>
       <div class="fields">
         <div class="field">
           <label for="msg-business">{page.fields.business}</label>
@@ -90,7 +91,7 @@ const channels = [
   if (form && preview && copy && status) {
     const value = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | null)?.value.trim() ?? '';
     const build = () => {
-      const needs = [...form.querySelectorAll<HTMLInputElement>('input[name="need"]:checked')].map(input => input.value.toLowerCase());
+      const needs = [...form.querySelectorAll<HTMLInputElement>('input[name="need"]:checked')].map(input => input.value);
       const lines = ['Здравствуйте!'];
       if (value('business')) lines.push(`Чем занимаюсь: ${value('business')}.`);
       if (needs.length) lines.push(`Нужно: ${needs.join(', ')}.`);
@@ -100,6 +101,24 @@ const channels = [
     };
     form.addEventListener('input', build);
     form.addEventListener('submit', event => event.preventDefault());
+
+    // Расчёт из калькулятора на странице стоимости: подставляем его в «Что ещё важно» и отмечаем выбранные услуги.
+    try {
+      const saved = sessionStorage.getItem('akhan-estimate');
+      const details = form.elements.namedItem('details') as HTMLTextAreaElement | null;
+      const parsed: unknown = saved ? JSON.parse(saved) : null;
+      if (details && parsed && typeof parsed === 'object' && 'lines' in parsed && 'total' in parsed && Array.isArray(parsed.lines) && typeof parsed.total === 'number') {
+        const money = (n: number) => `${n.toLocaleString('ru-RU')} ₽`;
+        const rows = (parsed.lines as unknown[]).filter((line): line is [string, number] => Array.isArray(line) && typeof line[0] === 'string' && typeof line[1] === 'number');
+        details.value = [form.dataset['estimateHead'] ?? '', ...rows.map(([name, price]) => `${name}: ${money(price)}`), `${form.dataset['estimateTotal'] ?? ''}: от ${money(parsed.total)}`].join('\n');
+        details.rows = Math.min(8, rows.length + 3);
+        rows.forEach(([name]) => {
+          const chip = [...form.querySelectorAll<HTMLInputElement>('input[name="need"]')].find(input => input.value === name);
+          if (chip) chip.checked = true;
+        });
+        document.querySelector<HTMLElement>('[data-estimate-note]')?.removeAttribute('hidden');
+      }
+    } catch { /* нет сохранённого расчёта или хранилище недоступно */ }
     build();
     const label = copy.textContent ?? '';
     copy.hidden = !navigator.clipboard;
@@ -138,6 +157,7 @@ const channels = [
   .more { display:inline-flex; align-items:center; min-height:44px; margin-top:20px; font:13px var(--mono); text-decoration:underline; text-underline-offset:4px }
 
   .builder-wrap { padding-bottom:var(--section) }
+  .estimate-note { max-width:56ch; margin-top:14px; color:var(--text); font-size:15px; line-height:1.6 }
   .builder { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(28px,4vw,72px); align-items:start }
   .fields { display:grid; gap:24px }
   .field { display:grid; gap:8px; margin:0; padding:0; border:0; min-width:0 }
@@ -168,8 +188,8 @@ const channels = [
   }
 
   @media (max-width:900px) {
-    .channels a { grid-template-columns:1fr }
-    .brief,.builder { grid-template-columns:1fr }
+    .channels a { grid-template-columns:minmax(0,1fr) }
+    .brief,.builder { grid-template-columns:minmax(0,1fr) }
     .preview { position:static }
   }
 </style>
