@@ -9,17 +9,19 @@ const canvas = document.querySelector<HTMLCanvasElement>('[data-ink]');
 const trigger = document.querySelector<HTMLElement>('#development');
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-if (canvas && trigger && !calm) {
+// На главной фон появляется у раздела «Как работаю» (первый экран занимает чёрная дыра). На остальных страницах такого раздела нет,
+// поэтому фон виден сразу и целиком.
+if (canvas && !calm) {
   const ctx = canvas.getContext('2d');
   if (ctx) run(canvas, ctx, trigger);
 }
 
-function run(target: HTMLCanvasElement, ctx: CanvasRenderingContext2D, section: HTMLElement) {
+function run(target: HTMLCanvasElement, ctx: CanvasRenderingContext2D, section: HTMLElement | null) {
   const blobs = Array.from({ length: 7 }, (_, i) => ({
     x: 0.1 + ((i * 0.41) % 0.8), y: 0.05 + ((i * 0.37) % 0.9),
     r: 0.13 + (i % 3) * 0.04, phase: i * 1.9, speed: 0.05 + (i % 4) * 0.018, depth: 0.2 + (i % 4) * 0.2,
   }));
-  let width = 0, height = 0, image: ImageData | null = null, shown = 0, follow = scrollY, swell = 0, last = 0, visible = true;
+  let width = 0, height = 0, image: ImageData | null = null, shown = section ? 0 : 1, follow = scrollY, swell = 0, last = 0, visible = true;
 
   const resize = () => {
     const scale = Math.min(0.34, 520 / innerWidth);
@@ -30,7 +32,7 @@ function run(target: HTMLCanvasElement, ctx: CanvasRenderingContext2D, section: 
   };
   resize();
   addEventListener('resize', resize, { passive: true });
-  ScrollTrigger.create({ trigger: section, start: 'top 85%', end: 'top 30%', onUpdate: self => { shown = self.progress; } });
+  if (section) ScrollTrigger.create({ trigger: section, start: 'top 85%', end: 'top 30%', onUpdate: self => { shown = self.progress; } });
   document.addEventListener('visibilitychange', () => { visible = !document.hidden; });
 
   const frame = (now: number) => {

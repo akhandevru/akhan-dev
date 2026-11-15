@@ -1,0 +1,139 @@
+---
+import SectionPage from '../layouts/SectionPage.astro';
+import { content, siteConfig } from '../config';
+const { pricing } = content;
+const { pricingFactors: factors, pricingFaq: faq, pricingCalc: calc } = content.extras;
+
+/** Первое число из строки цены: «от 15 000 ₽» даёт 15000. */
+const amount = (price: string) => Number(price.replace(/[^\d]/g, '')) || 0;
+const [single, multi, bot, admin] = pricing.items;
+const sites = [single, multi].filter(item => item !== undefined).map(item => ({ title: item.title, value: amount(item.price) }));
+const addons = [bot, admin].filter(item => item !== undefined).map(item => ({ title: item.title, value: amount(item.price), price: item.price }));
+const format = (value: number) => `от ${value.toLocaleString('ru-RU')} ₽`;
+const initial = sites[0]?.value ?? 0;
+---
+<SectionPage page="pricing" name={pricing.title} path="/pricing/">
+  <header class="wrap page-head">
+    <h1>{pricing.title}</h1>
+    <p>{pricing.description}</p>
+  </header>
+
+  <section class="wrap" aria-label={pricing.title}>
+    <ul class="plans">
+      {pricing.items.map((item, index) => (
+        <li class:list={['plan', { wide: index < 2 }]} data-rise>
+          <h2>{item.title}</h2>
+          <p class="plan-price">{item.price}</p>
+          <p class="plan-text">{item.description}</p>
+          <ul class="plan-list" aria-label={`${pricing.includesLabel}: ${item.title}`}>{item.includes.map(text => <li>{text.replace(/\.$/, '')}</li>)}</ul>
+          <a class="pill" href={siteConfig.telegram} target="_blank" rel="noopener noreferrer" aria-label={`${content.ui.discuss}: ${item.title}`}>{content.ui.discuss}</a>
+        </li>
+      ))}
+    </ul>
+    <p class="plans-note">{pricing.note}</p>
+  </section>
+
+  <section class="section wrap" aria-labelledby="calc-heading">
+    <div class="calc" data-calc>
+      <div>
+        <h2 class="extra-title" id="calc-heading">{calc.title}</h2>
+        <p class="extra-intro">{calc.description}</p>
+        <fieldset>
+          <legend>{calc.siteLabel}</legend>
+          <label class="option"><input type="radio" name="site" value="0" /><span>{calc.siteNone}</span></label>
+          {sites.map((site, index) => <label class="option"><input type="radio" name="site" value={site.value} checked={index === 0} /><span>{site.title}</span><span class="option-price">{format(site.value)}</span></label>)}
+        </fieldset>
+        <fieldset>
+          <legend>{calc.extrasLabel}</legend>
+          {addons.map(addon => <label class="option"><input type="checkbox" name="addon" value={addon.value} /><span>{addon.title}</span><span class="option-price">{addon.price}</span></label>)}
+        </fieldset>
+      </div>
+      <div class="calc-result">
+        <p class="calc-label" id="calc-label">{calc.resultLabel}</p>
+        <p class="calc-sum" aria-labelledby="calc-label" aria-live="polite" data-calc-sum data-empty={calc.empty}>{format(initial)}</p>
+        <a class="calc-action" href={siteConfig.telegram} target="_blank" rel="noopener noreferrer">{calc.action}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="factors-heading">
+    <h2 class="extra-title extra-head" id="factors-heading" data-rise>{factors.title}</h2>
+    <ul class="factors">
+      {factors.items.map(item => <li data-rise><h3>{item.title}</h3><p>{item.description}</p></li>)}
+    </ul>
+  </section>
+
+  <section class="section wrap" aria-labelledby="faq-heading">
+    <h2 class="extra-title extra-head" id="faq-heading" data-rise>{faq.title}</h2>
+    <dl class="faq">
+      {faq.items.map(item => <div data-rise><dt>{item.question}</dt><dd>{item.answer}</dd></div>)}
+    </dl>
+  </section>
+</SectionPage>
+
+<script>
+  // Сумма стартовых цен отмеченных услуг. Без JS видна сумма для выбора по умолчанию.
+  const root = document.querySelector<HTMLElement>('[data-calc]');
+  const sum = root?.querySelector<HTMLElement>('[data-calc-sum]');
+  if (root && sum) {
+    const update = () => {
+      const total = [...root.querySelectorAll<HTMLInputElement>('input:checked')].reduce((acc, input) => acc + Number(input.value), 0);
+      sum.textContent = total > 0 ? `от ${total.toLocaleString('ru-RU')} ₽` : (sum.dataset['empty'] ?? '');
+      sum.classList.toggle('is-empty', total === 0);
+    };
+    root.addEventListener('change', update);
+    update();
+  }
+</script>
+
+<style>
+  .plans { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:clamp(14px,1.6vw,22px) }
+  .plan { grid-column:span 2; display:flex; flex-direction:column; align-items:flex-start; gap:16px; padding:clamp(24px,2.6vw,40px); border:1.5px solid var(--line); border-radius:var(--radius) }
+  .plan.wide { grid-column:span 3 }
+  .plan h2 { font:700 clamp(20px,1.8vw,28px)/1.2 var(--display); letter-spacing:-.04em }
+  .plan-price { font:800 clamp(30px,3.4vw,56px)/1 var(--display); letter-spacing:-.05em; font-variant-numeric:tabular-nums; white-space:nowrap }
+  .plan-text { max-width:44ch; color:var(--secondary); font-size:16px; line-height:1.65 }
+  .plan-list { display:grid; gap:8px; margin-bottom:8px; padding-top:16px; border-top:1px solid var(--line); width:100%; font-size:15px; line-height:1.5 }
+  .plan-list li { position:relative; padding-left:18px }
+  .plan-list li::before { content:''; position:absolute; left:0; top:.6em; width:6px; height:6px; border-radius:50%; background:var(--muted) }
+  .plan .pill { margin-top:auto }
+  .plans-note { max-width:80ch; margin-top:24px; color:var(--secondary); font-size:15px; line-height:1.7 }
+
+  .calc { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:clamp(32px,5vw,96px); align-items:start }
+  fieldset { margin:clamp(24px,3vw,40px) 0 0; padding:0; border:0; min-width:0 }
+  legend { margin-bottom:10px; padding:0; color:var(--muted); font:12px/1.6 var(--mono) }
+  .option { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px; min-height:56px; padding-inline:4px; border-bottom:1px solid var(--line); cursor:pointer; font-size:17px }
+  .option input { width:20px; height:20px; margin:0; accent-color:var(--text) }
+  .option-price { color:var(--secondary); font:13px var(--mono); white-space:nowrap }
+  .option:has(input:checked) { font-weight:600 }
+  .calc-result { position:sticky; top:calc(var(--hh) + 24px); display:grid; gap:16px; justify-items:start; padding:clamp(28px,3.4vw,52px); border-radius:var(--radius); background:var(--panel-bg); color:var(--panel-text) }
+  .calc-label { color:var(--panel-muted); font:12px/1.6 var(--mono) }
+  .calc-sum { font:800 clamp(36px,4.6vw,80px)/1 var(--display); letter-spacing:-.055em; font-variant-numeric:tabular-nums }
+  .calc-sum.is-empty { font-size:clamp(20px,1.8vw,28px); letter-spacing:-.03em; color:var(--panel-muted) }
+  .calc-action { display:inline-flex; align-items:center; min-height:52px; margin-top:8px; padding:12px 28px; border-radius:999px; background:var(--panel-text); color:var(--panel-bg); font:600 15px/1.2 var(--sans) }
+  .calc-action:focus-visible { outline:2px solid var(--panel-text); outline-offset:4px }
+  @media (hover:hover) {
+    .calc-action { transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease }
+    .calc-action:hover { background:transparent; color:var(--panel-text); box-shadow:inset 0 0 0 1.5px var(--panel-text) }
+  }
+
+  .factors { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(28px,4vw,72px) }
+  .factors h3 { font:800 clamp(34px,3.2vw,58px)/1 var(--display); letter-spacing:-.06em; color:transparent; -webkit-text-stroke:1.5px var(--text) }
+  .factors p { max-width:40ch; margin-top:18px; color:var(--secondary); font-size:16px; line-height:1.7 }
+  .faq { border-top:1.5px solid var(--text) }
+  .faq > div { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:12px clamp(24px,5vw,96px); padding-block:clamp(20px,2.6vw,36px); border-bottom:1.5px solid var(--line) }
+  .faq dt { font:600 clamp(19px,1.8vw,27px)/1.25 var(--display); letter-spacing:-.035em }
+  .faq dd { max-width:60ch; color:var(--secondary); font-size:17px; line-height:1.7 }
+
+  @media (max-width:1100px) {
+    .plans { grid-template-columns:repeat(2,minmax(0,1fr)) }
+    .plan,.plan.wide { grid-column:auto }
+  }
+  @media (max-width:900px) {
+    .calc { grid-template-columns:1fr }
+    .calc-result { position:static }
+    .factors { grid-template-columns:1fr }
+    .faq > div { grid-template-columns:1fr }
+  }
+  @media (max-width:640px) { .plans { grid-template-columns:1fr } }
+</style>

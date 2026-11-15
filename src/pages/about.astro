@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import SectionPage from '../layouts/SectionPage.astro';
+import portrait from '../assets/profile/artem-khan.png';
+import { content, siteConfig } from '../config';
+import { projects } from '../data/projects';
+const [lead, ...rest] = content.about;
+const recent = projects.slice(0, 3);
+const { aboutWork, aboutSite } = content.extras;
+---
+<SectionPage page="about" name={content.ui.about} path="/about/">
+  <header class="wrap page-head intro">
+    <div>
+      <h1>{content.ui.about}</h1>
+      <p class="lead">{lead}</p>
+    </div>
+    <figure class="me">
+      <Image src={portrait} alt={`Портрет: ${siteConfig.name}`} widths={[400, 700, 1000]} sizes="(max-width: 900px) 80vw, 34vw" format="webp" quality={84} loading="eager" />
+      <figcaption>{siteConfig.name}, {siteConfig.role.toLowerCase()}, {siteConfig.location}</figcaption>
+    </figure>
+  </header>
+
+  <section class="wrap prose" aria-label={content.ui.about}>
+    {rest.map(paragraph => <p data-rise>{paragraph}</p>)}
+  </section>
+
+  <section class="section wrap facts" aria-label={`${content.ui.stack}, ${content.ui.now}, ${content.ui.outside}`}>
+    <div data-rise>
+      <h2>{content.ui.stack}</h2>
+      <dl>{content.stack.map(({ category, items }) => <div><dt>{category}</dt><dd>{items.join(', ')}</dd></div>)}</dl>
+    </div>
+    <div data-rise>
+      <h2>{content.ui.now}</h2>
+      <p>{content.now}</p>
+    </div>
+    <div data-rise>
+      <h2>{content.ui.outside}</h2>
+      <p>{content.outside}</p>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="recent-heading">
+    <div class="recent-head extra-head" data-rise>
+      <h2 class="extra-title" id="recent-heading">{aboutWork.title}</h2>
+      <a class="pill" href="/projects/">{content.ui.allProjects}</a>
+    </div>
+    <ul class="recent">
+      {recent.map(project => (
+        <li data-rise>
+          <a href={project.demo}>
+            <span class="shot"><Image src={project.image} alt={`Главная страница сайта «${project.name}»`} widths={[480, 720, 960]} sizes="(max-width: 900px) calc(100vw - 40px), 30vw" format="webp" quality={70} loading="lazy" /></span>
+            <span class="name">{project.name}</span>
+            <span class="category">{project.category}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section wrap" aria-labelledby="site-heading">
+    <div class="this-site" data-rise>
+      <h2 class="extra-title" id="site-heading">{aboutSite.title}</h2>
+      <p>{aboutSite.description}</p>
+      <a class="pill" href={siteConfig.source} target="_blank" rel="noopener noreferrer">{aboutSite.action}</a>
+    </div>
+  </section>
+</SectionPage>
+
+<style>
+  .intro { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:clamp(32px,6vw,112px); align-items:end }
+  .intro .lead { max-width:30ch; font-size:clamp(22px,2.4vw,38px); line-height:1.25; font-weight:500; letter-spacing:-.025em; color:var(--text); text-wrap:pretty }
+  .me { display:grid; gap:12px }
+  .me :global(img) { width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 35%; border-radius:var(--radius); filter:grayscale(1) contrast(1.05) }
+  .me figcaption { color:var(--muted); font:12px/1.6 var(--mono) }
+
+  .prose { display:grid; gap:clamp(20px,2.4vw,34px); padding-left:clamp(0px,24vw,440px) }
+  .prose p { max-width:36ch; font-size:clamp(20px,2vw,32px); line-height:1.35; font-weight:500; letter-spacing:-.02em; color:var(--secondary); text-wrap:pretty }
+
+  .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(28px,4vw,64px) }
+  .facts > div { padding-top:20px; border-top:1.5px solid var(--text) }
+  .facts h2 { margin-bottom:16px; font:700 clamp(20px,1.8vw,28px)/1.2 var(--display); letter-spacing:-.04em }
+  .facts p { max-width:44ch; color:var(--secondary); line-height:1.75 }
+  .facts dl { display:grid; gap:14px }
+  .facts dt { color:var(--muted); font:12px/1.6 var(--mono) }
+  .facts dd { margin-top:2px; font-size:16px; line-height:1.6 }
+
+  .recent-head { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px 32px }
+  .recent { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(16px,2vw,32px) }
+  .recent a { display:grid; gap:6px }
+  .shot { display:block; overflow:hidden; aspect-ratio:4/3; margin-bottom:10px; border-radius:var(--radius); border:1.5px solid var(--line) }
+  .shot :global(img) { display:block; width:100%; height:auto }
+  .name { font:700 clamp(20px,1.8vw,28px)/1.2 var(--display); letter-spacing:-.04em }
+  .category { color:var(--secondary); font:13px/1.6 var(--mono) }
+  .recent a:focus-visible { outline:2px solid var(--text); outline-offset:6px; border-radius:var(--radius) }
+  @media (hover:hover) and (prefers-reduced-motion:no-preference) {
+    .shot :global(img) { transition:transform 900ms cubic-bezier(.2,.8,.2,1) }
+    .recent a:hover .shot :global(img) { transform:translateY(-8%) }
+  }
+
+  .this-site { display:grid; justify-items:start; gap:clamp(18px,2vw,28px); max-width:1000px }
+  .this-site p { max-width:56ch; color:var(--secondary); font-size:clamp(17px,1.4vw,20px); line-height:1.65 }
+
+  @media (max-width:900px) {
+    .intro { grid-template-columns:1fr; align-items:start }
+    .me { width:min(100%,420px) }
+    .prose { padding-left:0 }
+    .facts,.recent { grid-template-columns:1fr }
+  }
+</style>

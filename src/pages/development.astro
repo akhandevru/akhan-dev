@@ -1,0 +1,90 @@
+---
+import SectionPage from '../layouts/SectionPage.astro';
+import { content } from '../config';
+const { development, workflow } = content;
+const { developmentNeeds: needs, developmentResult: result } = content.extras;
+---
+<SectionPage page="development" name={development.sectionTitle} path="/development/">
+  <header class="wrap page-head">
+    <h1>{development.sectionTitle}</h1>
+    <p>{development.description}</p>
+  </header>
+
+  <section class="wrap" aria-labelledby="steps-heading">
+    <h2 class="extra-title extra-head" id="steps-heading" data-rise>{workflow.title}</h2>
+    <ol class="steps">
+      {workflow.items.map((item, index) => (
+        <li data-rise>
+          <span class="step-n" aria-hidden="true">{index + 1}</span>
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section wrap included" aria-labelledby="included-heading">
+    <div class="included-head" data-rise>
+      <h2 class="extra-title" id="included-heading">{development.title}</h2>
+    </div>
+    <ul class="included-list">
+      {development.items.map(item => <li data-rise><h3>{item.title}</h3><p>{item.description}</p></li>)}
+    </ul>
+  </section>
+
+  <section class="section wrap" aria-labelledby="needs-heading">
+    <div class="extra-head" data-rise>
+      <h2 class="extra-title" id="needs-heading">{needs.title}</h2>
+      <p class="extra-intro">{needs.description}</p>
+    </div>
+    <ul class="needs">
+      {needs.items.map(item => <li data-rise><h3>{item.title}</h3><p>{item.description}</p></li>)}
+    </ul>
+  </section>
+
+  <section class="section wrap" aria-labelledby="result-heading">
+    <div class="result" data-rise>
+      <h2 class="extra-title" id="result-heading">{result.title}</h2>
+      <ul class="result-list">
+        {result.items.map(item => <li><h3>{item.title}</h3><p>{item.description}</p></li>)}
+      </ul>
+    </div>
+  </section>
+</SectionPage>
+
+<style>
+  .steps { border-top:1.5px solid var(--text) }
+  .steps li { display:grid; grid-template-columns:clamp(56px,9vw,160px) minmax(0,1fr) minmax(0,1.2fr); align-items:baseline; gap:12px clamp(20px,4vw,72px); padding-block:clamp(22px,3vw,44px); border-bottom:1.5px solid var(--line) }
+  .step-n { font:800 clamp(36px,5vw,84px)/.9 var(--display); letter-spacing:-.06em }
+  .steps h3 { font:700 clamp(22px,2.4vw,38px)/1.1 var(--display); letter-spacing:-.045em }
+  .steps p { max-width:52ch; color:var(--secondary); font-size:clamp(15px,1.2vw,18px); line-height:1.7 }
+
+  .included { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:clamp(32px,6vw,112px); align-items:start }
+  .included-head { position:sticky; top:calc(var(--hh) + 32px) }
+  .included-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(32px,4vw,64px) clamp(24px,3vw,48px) }
+  .included-list h3 { font:700 clamp(18px,1.5vw,23px)/1.25 var(--display); letter-spacing:-.035em }
+  .included-list p { margin-top:12px; color:var(--secondary); font-size:15px; line-height:1.7 }
+
+  .needs { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(20px,2.4vw,40px) }
+  .needs li { padding-top:20px; border-top:1.5px solid var(--text) }
+  .needs h3 { font:700 clamp(18px,1.5vw,23px)/1.25 var(--display); letter-spacing:-.035em }
+  .needs p { margin-top:12px; color:var(--secondary); font-size:15px; line-height:1.7 }
+
+  .result { padding:clamp(28px,4.4vw,72px); border:1.5px solid var(--line); border-radius:var(--radius) }
+  .result-list { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(24px,3vw,48px); margin-top:clamp(28px,4vw,56px) }
+  .result-list h3 { font:700 clamp(20px,1.8vw,28px)/1.2 var(--display); letter-spacing:-.04em }
+  .result-list p { margin-top:12px; color:var(--secondary); font-size:15px; line-height:1.7 }
+
+  @media (max-width:1100px) {
+    .needs,.result-list { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  }
+  @media (max-width:900px) {
+    .steps li { grid-template-columns:auto minmax(0,1fr) }
+    .steps p { grid-column:2 }
+    .included { grid-template-columns:1fr }
+    .included-head { position:static }
+  }
+  @media (max-width:640px) {
+    .included-list,.needs,.result-list { grid-template-columns:1fr }
+  }
+</style>

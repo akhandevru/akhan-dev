@@ -1,0 +1,17 @@
+---
+// Отдельная страница раздела. Содержимое своё (не копия блока главной), в конце плашка «Расскажите о задаче»
+// (кроме страницы контактов).
+import Layout from './Layout.astro';
+import PageCta from '../components/PageCta.astro';
+import { content, siteConfig } from '../config';
+import { breadcrumbs } from '../lib/seo';
+interface Props { page: keyof typeof content.pages; name: string; path: string }
+const { page, name, path } = Astro.props;
+const { title, description } = content.pages[page];
+const schema = [breadcrumbs([{ name: siteConfig.name, path: '/' }, { name, path }])];
+---
+<Layout title={`${title} | ${siteConfig.name}`} description={description} schema={schema} bleed>
+  <div class="wrap page-top"><a class="back-link" href="/">{content.ui.backHome}</a></div>
+  <slot />
+  {page !== 'contact' && <PageCta />}
+</Layout>

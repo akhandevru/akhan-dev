@@ -13,7 +13,7 @@ import { metrikaId } from '../lib/analytics';
 interface Props { title?: string; description?: string; noindex?: boolean; schema?: Record<string, unknown>[]; bleed?: boolean; }
 const { title = siteConfig.title, description = siteConfig.description, noindex = false, schema = [], bleed = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, siteConfig.url);
-const ogImage = new URL('/og.png', siteConfig.url);
+const ogImage = new URL('/og.jpg', siteConfig.url);
 const ogImageAlt = `${siteConfig.name}. ${siteConfig.role}.`;
 const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: schema });
 ---
@@ -44,7 +44,7 @@ const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: 
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:secure_url" content={ogImage} />
-    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogImageAlt} />

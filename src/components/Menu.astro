@@ -1,6 +1,7 @@
 ---
 import { siteConfig, content } from '../config';
-const links = [...content.navigation, { id: 'contact', label: content.ui.contact }];
+const links = [...content.navigation, { id: 'contact', label: content.ui.contact, path: content.contactPath }];
+const current = (path: string) => Astro.url.pathname === path ? 'page' : undefined;
 ---
 <dialog class="menu" id="menu" aria-label="Меню">
   <div class="menu-inner">
@@ -9,7 +10,7 @@ const links = [...content.navigation, { id: 'contact', label: content.ui.contact
       <button class="menu-close" type="button" data-menu-close>{content.ui.close}</button>
     </div>
     <nav class="menu-list" aria-label={content.ui.navigation}>
-      {links.map(({ id, label }) => <span class="menu-line"><a href={`/#${id}`} data-menu-link><span>{label}</span></a></span>)}
+      {links.map(({ id, label, path }) => <span class="menu-line"><a href={path} data-section={id} aria-current={current(path)} data-menu-link><span>{label}</span></a></span>)}
     </nav>
     <div class="menu-foot">
       <a href={siteConfig.telegram} target="_blank" rel="noopener noreferrer">Telegram</a>

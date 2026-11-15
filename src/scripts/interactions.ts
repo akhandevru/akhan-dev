@@ -125,25 +125,3 @@ document.querySelectorAll<HTMLButtonElement>('[data-preview-toggle]').forEach(bu
     button.textContent = (active ? button.dataset['resetLabel'] : button.dataset['scrollLabel']) ?? '';
   });
 });
-
-// Текущий раздел подсвечивается в шапке и в меню: активен тот, что пересекает середину экрана.
-const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('.header-nav a[href^="/#"], [data-menu-link]')];
-const navSections = [...new Set(navLinks.map(link => link.hash.slice(1)))]
-  .map(id => document.getElementById(id))
-  .filter((section): section is HTMLElement => section !== null);
-if (navSections.length > 0 && 'IntersectionObserver' in window) {
-  const visible = new Set<string>();
-  const mark = () => {
-    // Если середину пересекают два раздела (на стыке), берём нижний: он только что пришёл.
-    const current = navSections.filter(section => visible.has(section.id)).pop()?.id ?? '';
-    navLinks.forEach(link => {
-      if (link.hash.slice(1) === current) link.setAttribute('aria-current', 'location');
-      else link.removeAttribute('aria-current');
-    });
-  };
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if (entry.isIntersecting) visible.add(entry.target.id); else visible.delete(entry.target.id); });
-    mark();
-  }, { rootMargin: '-48% 0px -48% 0px' });
-  navSections.forEach(section => observer.observe(section));
-}

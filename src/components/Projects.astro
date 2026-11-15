@@ -16,7 +16,7 @@ const ring = await Promise.all(shown.map(async project => ({ ...project, texture
 
   <!-- Запасной вариант без 3D: цветные карточки. При работающей 3D-сцене скрыты. -->
   <ol class="cards" aria-label={content.ui.projectList}>
-    {featured.map((project, index) => <ProjectItem project={project} index={index} eager stacked />)}
+    {featured.map((project, index) => <ProjectItem project={project} index={index} stacked />)}
   </ol>
 
   <!-- 3D-режим: экраны проектов летают в сцене, здесь только подписи к активному. -->

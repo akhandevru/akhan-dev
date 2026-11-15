@@ -18,7 +18,7 @@ const { project, index, eager = false, stacked = false } = Astro.props;
     <a class="card-preview" href={project.demo} aria-label={`${project.previewLabel}. ${content.ui.projectPreview}: ${project.name}`} data-project-preview>
       <span class="browser-bar" aria-hidden="true"><span class="browser-dots"><i></i><i></i><i></i></span><span>{project.previewLabel}</span></span>
       <span class="project-window" data-preview-window>
-        <Image class="preview-image" src={project.image} alt={`Главная страница сайта «${project.name}»`} widths={[480, 672, 840, 960, 1440]} sizes="(min-width: 901px) 55vw, calc(100vw - 80px)" format="avif" quality={55} loading={eager || index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} data-preview-image />
+        <Image class="preview-image" src={project.image} alt={`Главная страница сайта «${project.name}»`} widths={[480, 672, 840, 960, 1440]} sizes="(min-width: 901px) 55vw, calc(100vw - 80px)" format="avif" quality={55} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} data-preview-image />
       </span>
     </a>
   </article>

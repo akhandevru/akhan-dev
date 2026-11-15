@@ -198,7 +198,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
   ScrollTrigger.refresh();
 
   const began = performance.now();
-  let focusNow = 0, activeIndex = -1, shownIndex = -2, last = began, lastShift = 1e9, lastSize = 0, lastEnd = -1;
+  let focusNow = 0, activeIndex = -1, shownIndex = -2, last = began, lastShift = 1e9, lastSize = 0, lastEnd = -1, cleared = false;
 
   const frame = () => {
     requestAnimationFrame(frame);
@@ -287,6 +287,15 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
     target.style.opacity = '1';
 
     const holeFade = 1 - smooth(state.b * 1.6);
+    // Когда дыры уже не видно и лента вне экрана (читают «Как работаю», «Стоимость» и ниже), кадр не рисуется: холст остаётся пустым.
+    if (holeFade <= 0.01 && !onScreen) {
+      if (cleared) return;
+      cleared = true;
+      renderer.setRenderTarget(null);
+      renderer.clear();
+      return;
+    }
+    cleared = false;
     renderer.setRenderTarget(null);
     renderer.clear();
     if (holeFade > 0.01) {

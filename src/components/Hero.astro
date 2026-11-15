@@ -9,7 +9,8 @@ const lines = [first, rest.join(' ')];
     <p class:list={['availability', { available: siteConfig.available }]}><span aria-hidden="true"></span>{siteConfig.availability}</p>
   </div>
 
-  <h1 id="intro-heading" aria-label={siteConfig.name} data-hero-name>
+  <h1 id="intro-heading" data-hero-name>
+    <span class="sr-only">{siteConfig.name}</span>
     {lines.map(line => (
       <span class="line" aria-hidden="true"><span class="line-in">{[...line].map(ch => <span class="ch">{ch}</span>)}</span></span>
     ))}

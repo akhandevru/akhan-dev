@@ -11,7 +11,7 @@ const schema = [breadcrumbs([{ name: siteConfig.name, path: '/' }, { name: conte
     <a class="back-link" href="/">{content.ui.backHome}</a>
     <h1 id="work-heading">{content.workPageTitle}</h1>
     <p class="section-introduction">{content.workPageDescription}</p>
-    <ol class="projects-list" aria-label={content.ui.projectList}>{projects.map((project, index) => <ProjectItem project={project} index={index} />)}</ol>
+    <ol class="projects-list" aria-label={content.ui.projectList}>{projects.map((project, index) => <ProjectItem project={project} index={index} eager={index === 0} />)}</ol>
     <p class="projects-note">{content.projectsNote}</p>
   </section>
 </Layout>

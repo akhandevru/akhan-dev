@@ -6,7 +6,7 @@ type Node = Record<string, unknown>;
 export const absolute = (path: string) => new URL(path, siteConfig.url).href;
 const personId = absolute('/#person');
 const websiteId = absolute('/#website');
-const imageUrl = absolute('/og.png');
+const imageUrl = absolute('/og.jpg');
 
 /** Первое число из строки цены: «от 15 000 ₽» даёт 15000, «По запросу» даёт null. */
 const minPrice = (price: string) => {
