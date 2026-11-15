@@ -51,7 +51,7 @@ const channels = [
       <div class="fields">
         <div class="field">
           <label for="msg-business">{page.fields.business}</label>
-          <input id="msg-business" name="business" type="text" autocomplete="organization" placeholder={page.placeholders.business} />
+          <input id="msg-business" class="ym-disable-keys" name="business" type="text" autocomplete="organization" placeholder={page.placeholders.business} />
         </div>
         <fieldset class="field">
           <legend>{page.fields.need}</legend>
@@ -61,14 +61,14 @@ const channels = [
         </fieldset>
         <div class="field">
           <label for="msg-deadline">{page.fields.deadline}</label>
-          <input id="msg-deadline" name="deadline" type="text" autocomplete="off" placeholder={page.placeholders.deadline} />
+          <input id="msg-deadline" class="ym-disable-keys" name="deadline" type="text" autocomplete="off" placeholder={page.placeholders.deadline} />
         </div>
         <div class="field">
           <label for="msg-details">{page.fields.details}</label>
-          <textarea id="msg-details" name="details" rows="3" placeholder={page.placeholders.details}></textarea>
+          <textarea id="msg-details" class="ym-disable-keys" name="details" rows="3" placeholder={page.placeholders.details}></textarea>
         </div>
       </div>
-      <div class="preview">
+      <div class="preview ym-hide-content">
         <label for="msg-preview">{page.preview}</label>
         <textarea id="msg-preview" readonly rows="8" data-builder-preview>Здравствуйте!</textarea>
         <div class="preview-actions">
