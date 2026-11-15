@@ -1,41 +1,25 @@
-const root = document.documentElement;
-const themeStorageKey = 'akhan-theme-v2';
-const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const themeButtons = document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]');
+export {};
+// Меню на весь экран: диалог с фокусом внутри, закрывается Esc, кнопкой и выбором пункта.
+const menu = document.querySelector<HTMLDialogElement>('#menu');
+let menuOpener: HTMLElement | null = null;
 
-function updateThemeControls() {
-  const dark = root.dataset['theme'] === 'dark';
-  themeButtons.forEach(button => {
-    button.setAttribute('aria-pressed', String(dark));
-    button.setAttribute('aria-label', (dark ? button.dataset['lightAria'] : button.dataset['darkAria']) ?? '');
-    const label = button.querySelector('[data-theme-label]');
-    if (label) label.textContent = (dark ? button.dataset['lightLabel'] : button.dataset['darkLabel']) ?? '';
+function openMenu() {
+  if (!menu || menu.open) return;
+  menuOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  menu.showModal();
+  document.body.style.overflow = 'hidden';
+  menu.dispatchEvent(new CustomEvent('menu-open'));
+}
+
+if (menu && typeof menu.showModal === 'function') {
+  document.querySelectorAll<HTMLElement>('[data-menu-open]').forEach(button => button.addEventListener('click', openMenu));
+  menu.querySelector('[data-menu-close]')?.addEventListener('click', () => menu.close());
+  menu.querySelectorAll<HTMLAnchorElement>('[data-menu-link]').forEach(link => link.addEventListener('click', () => menu.close()));
+  menu.addEventListener('close', () => {
+    document.body.style.overflow = '';
+    menuOpener?.focus({ preventScroll: true });
   });
 }
-
-function applyTheme(theme: string) {
-  root.dataset['theme'] = theme;
-  themeColor?.setAttribute('content', theme === 'light' ? '#f4f4f2' : '#151518');
-  updateThemeControls();
-}
-
-function toggleTheme() {
-  const next = root.dataset['theme'] === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  try { localStorage.setItem(themeStorageKey, next); } catch { /* Тема работает и без хранилища. */ }
-}
-
-themeButtons.forEach(button => {
-  button.hidden = false;
-  button.addEventListener('click', toggleTheme);
-});
-updateThemeControls();
-requestAnimationFrame(() => root.classList.add('theme-ready'));
-window.addEventListener('storage', event => {
-  if (event.key !== themeStorageKey) return;
-  applyTheme(event.newValue === 'light' ? 'light' : 'dark');
-});
 
 const dialog = document.querySelector<HTMLDialogElement>('#command-palette');
 const search = document.querySelector<HTMLInputElement>('#command-search');
@@ -72,7 +56,6 @@ document.querySelectorAll<HTMLButtonElement>('[data-command-open]').forEach(butt
   button.addEventListener('click', openCommands);
 });
 document.querySelector('[data-command-close]')?.addEventListener('click', () => dialog?.close());
-document.querySelector('[data-command-theme]')?.addEventListener('click', toggleTheme);
 search?.addEventListener('input', filterCommands);
 commandItems.forEach(item => item.addEventListener('click', () => {
   dialog?.close();
@@ -114,76 +97,6 @@ document.addEventListener('keydown', event => {
   }
 });
 
-if ('IntersectionObserver' in window) {
-  const sections = document.querySelectorAll<HTMLElement>('[data-reveal]');
-  const reveal = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('reveal-visible');
-      reveal.unobserve(entry.target);
-    });
-  }, { threshold: 0, rootMargin: '0px 0px -24px 0px' });
-  sections.forEach(section => {
-    if (!reducedMotion.matches) {
-      reveal.observe(section);
-    }
-  });
-}
-
-// Активен последний раздел, верхний край которого уже поднялся выше линии чтения.
-const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]'));
-const navSections = navLinks.flatMap(link => {
-  const section = document.getElementById(link.hash.slice(1));
-  return section ? [section] : [];
-});
-let activeNavigationId = '';
-let lockedNavigationId = '';
-let unlockTimer = 0;
-let navigationQueued = false;
-
-function markNavigation(id: string) {
-  if (id === activeNavigationId) return;
-  activeNavigationId = id;
-  navLinks.forEach(link => {
-    if (link.hash === `#${id}`) link.setAttribute('aria-current', 'location');
-    else link.removeAttribute('aria-current');
-  });
-}
-
-function updateNavigation() {
-  navigationQueued = false;
-  if (lockedNavigationId || navSections.length === 0) return;
-  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-  const line = window.innerHeight * .35;
-  let current = atBottom ? navSections[navSections.length - 1]!.id : '';
-  if (!atBottom) navSections.forEach(section => { if (section.getBoundingClientRect().top <= line) current = section.id; });
-  markNavigation(current);
-}
-
-function queueNavigation() {
-  if (navigationQueued) return;
-  navigationQueued = true;
-  requestAnimationFrame(updateNavigation);
-}
-
-// После клика подсветка держится на выбранном пункте, пока идёт плавная прокрутка.
-function releaseNavigation(delay: number) {
-  window.clearTimeout(unlockTimer);
-  unlockTimer = window.setTimeout(() => { lockedNavigationId = ''; updateNavigation(); }, delay);
-}
-
-navLinks.forEach(link => link.addEventListener('click', () => {
-  lockedNavigationId = link.hash.slice(1);
-  markNavigation(lockedNavigationId);
-  releaseNavigation(700);
-}));
-window.addEventListener('scroll', () => {
-  if (lockedNavigationId) releaseNavigation(140);
-  else queueNavigation();
-}, { passive: true });
-window.addEventListener('resize', queueNavigation, { passive: true });
-updateNavigation();
-
 // Размеры считаются только при загрузке и изменении ширины. Прокрутка выполняется CSS-transform.
 document.querySelectorAll<HTMLAnchorElement>('[data-project-preview]').forEach(preview => {
   const viewport = preview.querySelector<HTMLElement>('[data-preview-window]');
@@ -212,3 +125,25 @@ document.querySelectorAll<HTMLButtonElement>('[data-preview-toggle]').forEach(bu
     button.textContent = (active ? button.dataset['resetLabel'] : button.dataset['scrollLabel']) ?? '';
   });
 });
+
+// Текущий раздел подсвечивается в шапке и в меню: активен тот, что пересекает середину экрана.
+const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('.header-nav a[href^="/#"], [data-menu-link]')];
+const navSections = [...new Set(navLinks.map(link => link.hash.slice(1)))]
+  .map(id => document.getElementById(id))
+  .filter((section): section is HTMLElement => section !== null);
+if (navSections.length > 0 && 'IntersectionObserver' in window) {
+  const visible = new Set<string>();
+  const mark = () => {
+    // Если середину пересекают два раздела (на стыке), берём нижний: он только что пришёл.
+    const current = navSections.filter(section => visible.has(section.id)).pop()?.id ?? '';
+    navLinks.forEach(link => {
+      if (link.hash.slice(1) === current) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if (entry.isIntersecting) visible.add(entry.target.id); else visible.delete(entry.target.id); });
+    mark();
+  }, { rootMargin: '-48% 0px -48% 0px' });
+  navSections.forEach(section => observer.observe(section));
+}

@@ -1,0 +1,23 @@
+---
+import { content } from '../config';
+const items = [...content.pricing.items.map(item => item.title), 'Автоматизация'];
+---
+<div class="marquee" role="group" aria-label="Что я делаю">
+  <div class="track">
+    <ul>{items.map(item => <li>{item}</li>)}</ul>
+    <ul aria-hidden="true">{items.map(item => <li>{item}</li>)}</ul>
+  </div>
+</div>
+
+<style>
+  .marquee { position:relative; z-index:3; margin:clamp(24px,5vw,72px) -4vw 0; padding-block:clamp(14px,2vw,24px); background:var(--panel-bg); color:var(--panel-text); transform:rotate(-1.4deg); overflow:hidden }
+  .track { display:flex; width:max-content }
+  ul { display:flex; flex:0 0 auto }
+  li { display:inline-flex; align-items:center; font:700 clamp(22px,3.2vw,46px)/1.2 var(--display); letter-spacing:-.04em; white-space:nowrap }
+  li::after { content:'/'; margin-inline:clamp(18px,2.6vw,40px); color:var(--panel-muted); font-weight:400 }
+  @media (prefers-reduced-motion:no-preference) {
+    .track { animation:run 42s linear infinite }
+    .marquee:hover .track { animation-play-state:paused }
+    @keyframes run { to { transform:translateX(-50%) } }
+  }
+</style>

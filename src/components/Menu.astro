@@ -1,0 +1,25 @@
+---
+import { siteConfig, content } from '../config';
+const links = [...content.navigation, { id: 'contact', label: content.ui.contact }];
+---
+<dialog class="menu" id="menu" aria-label="Меню">
+  <div class="menu-inner">
+    <div class="menu-top">
+      <span class="mono-label">{siteConfig.brand}</span>
+      <button class="menu-close" type="button" data-menu-close>{content.ui.close}</button>
+    </div>
+    <nav class="menu-list" aria-label={content.ui.navigation}>
+      {links.map(({ id, label }) => <span class="menu-line"><a href={`/#${id}`} data-menu-link><span>{label}</span></a></span>)}
+    </nav>
+    <div class="menu-foot">
+      <a href={siteConfig.telegram} target="_blank" rel="noopener noreferrer">Telegram</a>
+      <a href={siteConfig.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+      <span>{siteConfig.location}</span>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .mono-label { font:13px var(--mono); color:var(--secondary) }
+  .menu-foot a { text-decoration:underline; text-underline-offset:4px }
+</style>

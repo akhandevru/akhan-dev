@@ -19,6 +19,9 @@ export interface Project {
   demo: string;
   year: string;
   scope: string[];
+  /** Цвет карточки проекта и признак тёмного фона (текст светлый). */
+  tone: string;
+  dark: boolean;
 }
 
 /** Демонстрационные интерфейсы. Названия компаний, адреса и контакты вымышлены. */
@@ -29,6 +32,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: poltarelki,
     previewLabel: 'poltarelki.example', demo: '/demos/poltarelki/index.html', year: '2026',
     scope: ['Срок и цена доставки от ближайшей кухни', 'Расчёт нормы калорий и цены рациона', 'Меню с фильтрами и составом блюд'],
+
+    tone: '#25252a', dark: true,
   },
   {
     id: 'socvetie', name: 'Соцветие', category: 'Цветочный магазин',
@@ -36,6 +41,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: socvetie,
     previewLabel: 'socvetie.example', demo: '/demos/socvetie/index.html', year: '2026',
     scope: ['Конструктор: букет меняется с каждым стеблем', 'Атлас цветов, который листается как книга', 'Каталог и заказ в два касания'],
+
+    tone: '#e4e4e1', dark: false,
   },
   {
     id: 'umlaut', name: 'Умлаут', category: 'Онлайн-школа языков',
@@ -43,6 +50,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: umlaut,
     previewLabel: 'umlaut.example', demo: '/demos/umlaut/index.html', year: '2026',
     scope: ['Тест на 4 языках с уровнем и разбором', 'Пересчёт цены курса по шести параметрам', 'Фильтры преподавателей и отзывов'],
+
+    tone: '#f5f5f3', dark: false,
   },
   {
     id: 'shov', name: 'Шов', category: 'Магазин одежды и обуви',
@@ -50,6 +59,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: shov,
     previewLabel: 'shov.example', demo: '/demos/shov/index.html', year: '2026',
     scope: ['Каталог с фильтрами и сортировкой', 'Карточки товаров с размерной сеткой', 'Корзина, доставка и тестовая оплата картой'],
+
+    tone: '#bcbcb9', dark: false,
   },
   {
     id: 'komnata', name: 'Комната', category: 'Мебельный магазин',
@@ -57,6 +68,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: komnata,
     previewLabel: 'komnata.example', demo: '/demos/komnata/index.html', year: '2026',
     scope: ['Каталог и категории мебели', 'Карточки товаров и интерьерные подборки', 'Пошаговый подбор под комнату и бюджет'],
+
+    tone: '#8f8f8c', dark: false,
   },
   {
     id: 'kontur', name: 'Контур', category: 'Детейлинг и тюнинг',
@@ -64,6 +77,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: kontur,
     previewLabel: 'kontur.example', demo: '/demos/kontur/index.html', year: '2026',
     scope: ['Каталог услуг с выбором задачи', 'Фильтруемая галерея работ', 'Форма расчёта и адаптивные страницы'],
+
+    tone: '#141415', dark: true,
   },
   {
     id: 'gran', name: 'Грань', category: 'Мебель на заказ',
@@ -71,6 +86,8 @@ export const projects: Project[] = [
     technologies: ['HTML', 'CSS', 'JavaScript'], image: gran,
     previewLabel: 'gran.example', demo: '/demos/gran/index.html', year: '2026',
     scope: ['Категории мебели на заказ', 'Галерея интерьерных проектов', 'Этапы работы и форма расчёта'],
+
+    tone: '#d1d1ce', dark: false,
   },
   {
     id: 'list', name: 'Чистый лист', category: 'Клининговый сервис',
@@ -78,5 +95,7 @@ export const projects: Project[] = [
     technologies: ['Node.js', 'JavaScript', 'CSS'], image: list,
     previewLabel: 'chisty-list.example', demo: '/demos/list/index.html', year: '2026',
     scope: ['Услуги и состав уборки', 'Сравнение результатов до и после', 'Пошаговый расчёт по параметрам объекта'],
+
+    tone: '#e9e9e6', dark: false,
   },
 ];

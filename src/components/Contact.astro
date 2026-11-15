@@ -1,0 +1,20 @@
+---
+import { siteConfig, content } from '../config';
+---
+<section class="section contact wrap" id="contact" aria-labelledby="contact-heading">
+  <h2 class="sr-only" id="contact-heading">{content.ui.contact}</h2>
+  <p class="big" data-rise>{content.contactHeading}<br /><span>{content.contactSubheading}</span></p>
+  <p class="text" data-rise>{content.contactDescription}</p>
+  <div class="links" data-rise>
+    <a class="pill pill-solid pill-big" data-magnetic href={siteConfig.telegram} target="_blank" rel="noopener noreferrer">{content.ui.openTelegram}</a>
+    <a class="pill pill-big" href={siteConfig.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+  </div>
+</section>
+
+<style>
+  .contact { min-height:80dvh; display:grid; align-content:end; justify-items:start; gap:clamp(20px,3vw,40px); padding-bottom:var(--section) }
+  .big { font:800 clamp(40px,11.5vw,150px)/.98 var(--display); letter-spacing:-.05em; text-transform:uppercase; text-wrap:balance; overflow-wrap:break-word }
+  .big span { color:var(--muted) }
+  .text { max-width:48ch; color:var(--secondary); font-size:clamp(18px,1.5vw,22px); line-height:1.6 }
+  .links { display:flex; flex-wrap:wrap; gap:14px }
+</style>

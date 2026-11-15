@@ -1,15 +1,17 @@
 ---
 import { siteConfig, content } from '../config';
 import '@fontsource-variable/onest';
+import '@fontsource-variable/unbounded';
+import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
+import Menu from '../components/Menu.astro';
 import CommandPalette from '../components/CommandPalette.astro';
-import AmbientBackground from '../components/AmbientBackground.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import { buildGraph } from '../lib/seo';
 import { metrikaId } from '../lib/analytics';
-interface Props { title?: string; description?: string; noindex?: boolean; schema?: Record<string, unknown>[]; }
-const { title = siteConfig.title, description = siteConfig.description, noindex = false, schema = [] } = Astro.props;
+interface Props { title?: string; description?: string; noindex?: boolean; schema?: Record<string, unknown>[]; bleed?: boolean; }
+const { title = siteConfig.title, description = siteConfig.description, noindex = false, schema = [], bleed = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, siteConfig.url);
 const ogImage = new URL('/og.png', siteConfig.url);
 const ogImageAlt = `${siteConfig.name}. ${siteConfig.role}.`;
@@ -20,17 +22,8 @@ const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: 
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#151518" />
-    <script is:inline>
-      // Сайт открывается в тёмной теме на всех устройствах. Светлая включается только переключателем и запоминается.
-      (() => {
-        let theme = 'dark';
-        try { if (localStorage.getItem('akhan-theme-v2') === 'light') theme = 'light'; } catch {}
-        document.documentElement.dataset.theme = theme;
-        if (theme === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f4f4f2');
-      })();
-    </script>
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#070708" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content={siteConfig.name} />
@@ -61,17 +54,15 @@ const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: 
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
     <script type="application/ld+json" set:html={JSON.stringify(graph).replace(/</g, '\\u003c')} />
-    <style>
-      .footer-button { display:inline-flex; align-items:center; min-height:44px; padding:0; border:0; background:none; color:inherit; font:10px var(--mono); cursor:pointer }
-      .footer-button:hover { color:var(--text) }
-    </style>
   </head>
   <body id="top">
-    <AmbientBackground />
+    <canvas class="bg-shader" aria-hidden="true" data-bg-shader></canvas>
+    <canvas class="ink-bg" aria-hidden="true" data-ink></canvas>
+    <canvas class="three-canvas" aria-hidden="true" data-three></canvas>
     <a class="skip-link" href="#main">{content.ui.skip}</a>
     <Header />
-    <main class="page-width" id="main" tabindex="-1"><slot /></main>
-    <footer class="site-footer page-width">
+    <main id="main" tabindex="-1" class:list={{ 'page-width': !bleed }}><slot /></main>
+    <footer class="site-footer">
       <p>© {siteConfig.copyrightYear} {siteConfig.name}</p>
       <div>
         <a href="/privacy/">Конфиденциальность</a>
@@ -79,9 +70,13 @@ const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: 
         <span>{content.ui.builtWith}</span>
       </div>
     </footer>
+    <Menu />
     <CookieBanner />
     <noscript><div><img src={`https://mc.yandex.ru/watch/${metrikaId}`} style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <CommandPalette />
     <script src="../scripts/interactions.ts"></script>
+    <script src="../scripts/shader-bg.ts"></script>
+    <script src="../scripts/ink-bg.ts"></script>
+    <script src="../scripts/parallax.ts"></script>
   </body>
 </html>

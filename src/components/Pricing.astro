@@ -1,9 +1,59 @@
 ---
 import { content, siteConfig } from '../config';
+const { pricing } = content;
 ---
-<section class="pricing-section" id="pricing" aria-labelledby="pricing-heading" data-reveal>
-  <h2 id="pricing-heading">{content.pricing.title}</h2>
-  <p class="section-introduction">{content.pricing.description}</p>
-  <div class="pricing-list">{content.pricing.items.map((item, index) => <article style={`--item-index:${index}`}><h3>{item.title}</h3><p class="price">{item.price}</p><p class="price-description">{item.description}</p><h4>{content.pricing.includesLabel}</h4><ul>{item.includes.map(text => <li>{text}</li>)}</ul><a class="action-button price-contact" href={siteConfig.telegram} target="_blank" rel="noopener noreferrer" aria-label={`${content.ui.discuss}: ${item.title}`}>{content.ui.discuss}</a></article>)}</div>
-  <p class="pricing-note">{content.pricing.note}</p>
+<section class="section wrap" id="pricing" aria-labelledby="pricing-heading">
+  <div class="section-head" data-rise>
+    <div>
+      <h2 class="section-title" id="pricing-heading">{pricing.title}</h2>
+      <p class="intro">{pricing.description}</p>
+    </div>
+  </div>
+
+  <div class="rows">
+    {pricing.items.map((item, index) => (
+      <details class="row" name="pricing" open={index === 0}>
+        <summary>
+          <span class="row-title">{item.title}</span>
+          <span class="price">{item.price}</span>
+        </summary>
+        <div class="row-body">
+          <p class="row-text">{item.description}</p>
+          <div>
+            <h4>{pricing.includesLabel}</h4>
+            <ul>{item.includes.map(text => <li>{text}</li>)}</ul>
+          </div>
+          <a class="pill" href={siteConfig.telegram} target="_blank" rel="noopener noreferrer" aria-label={`${content.ui.discuss}: ${item.title}`}>{content.ui.discuss}</a>
+        </div>
+      </details>
+    ))}
+  </div>
+  <p class="note">{pricing.note}</p>
 </section>
+
+<style>
+  .intro { max-width:56ch; margin-top:18px; color:var(--text); font-size:18px; line-height:1.7 }
+  .rows { border-top:1.5px solid var(--text) }
+  .row { border-bottom:1.5px solid var(--line) }
+  summary { display:flex; align-items:baseline; justify-content:space-between; gap:12px 32px; padding-block:clamp(18px,2.4vw,32px); cursor:pointer; list-style:none }
+  summary::-webkit-details-marker { display:none }
+  .row-title { font:700 clamp(22px,3.4vw,52px)/1.1 var(--display); letter-spacing:-.045em }
+  .price { font:600 clamp(18px,2vw,30px)/1.2 var(--display); letter-spacing:-.04em; white-space:nowrap; font-variant-numeric:tabular-nums }
+  .row-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto; align-items:start; gap:20px clamp(24px,4vw,64px); padding-bottom:clamp(24px,3vw,40px) }
+  .row-text { max-width:42ch; color:var(--text); font-size:17px; line-height:1.7 }
+  h4 { margin-bottom:12px; font:600 14px/1.4 var(--display); letter-spacing:-.02em; color:var(--secondary) }
+  ul { display:grid; gap:10px; font:400 16px/1.55 var(--sans); color:var(--text) }
+  li { position:relative; padding-left:18px }
+  li::before { content:''; position:absolute; left:0; top:.62em; width:6px; height:6px; border-radius:50%; background:var(--secondary) }
+  .note { max-width:80ch; margin-top:28px; color:var(--secondary); font-size:15px; line-height:1.7 }
+  summary:focus-visible { outline:2px solid currentColor; outline-offset:4px; border-radius:6px }
+  @media (hover:hover) { summary:hover .row-title { color:var(--muted) } }
+  @media (prefers-reduced-motion:no-preference) {
+    .row { interpolate-size:allow-keywords }
+    .row::details-content { block-size:0; overflow:clip; transition:block-size 420ms cubic-bezier(.2,.8,.2,1),content-visibility 420ms allow-discrete }
+    .row[open]::details-content { block-size:auto }
+    summary .row-title { transition:color 160ms ease }
+  }
+  @media (max-width:900px) { .row-body { grid-template-columns:1fr } }
+  @media (max-width:640px) { summary { flex-direction:column; align-items:flex-start; gap:6px } }
+</style>

@@ -1,0 +1,51 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/profile/artem-khan.png';
+import { siteConfig, content } from '../config';
+---
+<section class="section wrap" id="about" aria-labelledby="about-heading">
+  <div class="section-head" data-rise><h2 class="section-title" id="about-heading">{content.ui.about}</h2></div>
+  <div class="about-grid">
+    <div class="prose" data-words>{content.about.map(paragraph => <p>{paragraph}</p>)}</div>
+    <aside class="side">
+      <figure class="me" data-rise>
+        <Image src={portrait} alt={`Портрет: ${siteConfig.name}`} widths={[300, 600, 900]} sizes="(max-width: 900px) 70vw, 24vw" format="webp" quality={84} loading="lazy" />
+        <figcaption>{siteConfig.name}, {siteConfig.location}</figcaption>
+      </figure>
+      <section aria-labelledby="stack-heading" data-rise>
+        <h3 id="stack-heading">{content.ui.stack}</h3>
+        <dl>{content.stack.map(({ category, items }) => <div><dt>{category}</dt><dd><ul>{items.map(item => <li>{item}</li>)}</ul></dd></div>)}</dl>
+      </section>
+      <section aria-labelledby="now-heading" id="now" data-rise>
+        <h3 id="now-heading">{content.ui.now}</h3>
+        <p>{content.now}</p>
+      </section>
+      <section aria-labelledby="outside-heading" data-rise>
+        <h3 id="outside-heading">{content.ui.outside}</h3>
+        <p>{content.outside}</p>
+      </section>
+    </aside>
+  </div>
+</section>
+
+<style>
+  .about-grid { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:clamp(32px,6vw,112px); align-items:start }
+  .prose { display:grid; gap:clamp(20px,2.4vw,34px) }
+  .prose p { font-size:clamp(20px,2.3vw,36px); line-height:1.3; font-weight:500; letter-spacing:-.025em; text-wrap:pretty }
+  .side { display:grid; gap:clamp(28px,4vw,56px) }
+  .me { display:grid; gap:12px; width:min(100%,340px); justify-self:center; transform:rotate(3deg) }
+  .me :global(img) { width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 40%; border-radius:var(--radius); filter:grayscale(1) contrast(1.05) }
+  .me figcaption { font:12px/1.6 var(--mono); color:var(--muted) }
+  .side h3 { margin-bottom:14px; font:12px/1.6 var(--mono); font-weight:400; color:var(--muted) }
+  dl { display:grid; gap:18px }
+  dt { margin-bottom:8px; font-weight:600 }
+  dd ul { display:flex; flex-wrap:wrap; gap:8px }
+  dd li { padding:5px 14px; border:1.5px solid var(--line); border-radius:999px; font:13px/1.6 var(--mono) }
+  .side p { max-width:44ch; color:var(--secondary); line-height:1.75 }
+  @media (hover:hover) { dd li:hover { background:var(--text); color:var(--bg); border-color:var(--text) } }
+  @media (max-width:900px) {
+    .about-grid { grid-template-columns:1fr }
+    .side { position:static }
+    .me { width:min(78%,360px); transform:rotate(-3deg); margin-block:12px }
+  }
+</style>

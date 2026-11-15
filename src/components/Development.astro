@@ -1,13 +1,67 @@
 ---
 import { content } from '../config';
-import Workflow from './Workflow.astro';
+const { development, workflow } = content;
 ---
-<section class="development-section" id="development" aria-labelledby="development-heading" data-reveal>
-  <h2 id="development-heading">{content.development.sectionTitle}</h2>
-  <p class="section-introduction">{content.development.description}</p>
-  <Workflow />
-  <div class="development-included">
-    <h3>{content.development.title}</h3>
-    <ul class="development-list">{content.development.items.map((item, index) => <li style={`--item-index:${index}`}><h4>{item.title}</h4><p>{item.description}</p></li>)}</ul>
+<section class="section wrap" id="development" aria-labelledby="development-heading">
+  <div class="section-head" data-rise>
+    <div>
+      <h2 class="section-title" id="development-heading">{development.sectionTitle}</h2>
+      <p class="section-introduction">{development.description}</p>
+    </div>
+  </div>
+
+  <div class="flow">
+    <h3 class="sub" data-rise>{workflow.title}</h3>
+    <ol class="steps">
+      {workflow.items.map((item, index) => (
+        <li data-step>
+          <span class="step-n" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <div><h4>{item.title}</h4><p>{item.description}</p></div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <div class="included">
+    <h3 class="sub" data-rise>{development.title}</h3>
+    <ul class="included-list">
+      {development.items.map((item, index) => <li class:list={{ solid: index === 1 || index === 4 }} data-rise><h4>{item.title}</h4><p>{item.description}</p></li>)}
+    </ul>
   </div>
 </section>
+
+<style>
+  .sub { font:700 clamp(22px,2.6vw,38px)/1.15 var(--display); letter-spacing:-.04em; margin-bottom:clamp(20px,3vw,40px) }
+  .flow { position:relative }
+  .steps { position:relative; display:grid; gap:clamp(36px,6vw,88px); padding-left:clamp(0px,2vw,24px) }
+  .steps::before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:1.5px; background:var(--line); transform-origin:top }
+  .steps li { position:relative; display:grid; grid-template-columns:minmax(90px,.35fr) minmax(0,1fr); align-items:start; gap:clamp(16px,4vw,64px) }
+  .steps li:nth-child(even) { margin-left:clamp(0px,9vw,160px) }
+  .step-n { font:800 clamp(64px,13vw,220px)/.8 var(--display); letter-spacing:-.07em; color:transparent; -webkit-text-stroke:1.5px var(--text) }
+  .steps h4 { font:700 clamp(24px,3vw,46px)/1.1 var(--display); letter-spacing:-.045em }
+  .steps p { max-width:52ch; margin-top:14px; color:var(--secondary); font-size:clamp(15px,1.2vw,18px); line-height:1.7 }
+
+  .included { margin-top:var(--section) }
+  .included-list { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:clamp(14px,1.6vw,22px) }
+  .included-list li { grid-column:span 2; padding:clamp(22px,2.4vw,34px); border-radius:var(--radius); border:1.5px solid var(--line); min-width:0 }
+  .included-list li:nth-child(1),.included-list li:nth-child(4) { grid-column:span 3 }
+  .included-list li.solid { background:var(--panel-bg); color:var(--panel-text); border-color:var(--panel-bg) }
+  .included-list li.solid p { color:var(--panel-muted) }
+  .included-list h4 { font:700 clamp(18px,1.5vw,23px)/1.25 var(--display); letter-spacing:-.035em }
+  .included-list p { margin-top:12px; color:var(--secondary); font-size:15px; line-height:1.7 }
+
+  @supports (animation-timeline:view()) {
+    @media (prefers-reduced-motion:no-preference) {
+      .steps::before { animation:draw linear both; animation-timeline:view(); animation-range:entry 10% cover 80% }
+      .step-n { animation:fill linear both; animation-timeline:view(); animation-range:entry 20% cover 45% }
+      @keyframes draw { from { transform:scaleY(0) } }
+      @keyframes fill { to { color:var(--text) } }
+    }
+  }
+  @media (max-width:900px) {
+    .steps li,.steps li:nth-child(even) { grid-template-columns:1fr; margin-left:0 }
+    .step-n { font-size:clamp(64px,22vw,120px) }
+    .included-list { grid-template-columns:1fr }
+    .included-list li,.included-list li:nth-child(1),.included-list li:nth-child(4) { grid-column:auto }
+  }
+</style>

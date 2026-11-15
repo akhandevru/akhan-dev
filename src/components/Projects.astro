@@ -1,0 +1,63 @@
+---
+import { getImage } from 'astro:assets';
+import ProjectItem from './ProjectItem.astro';
+import { content } from '../config';
+import { projects } from '../data/projects';
+const shown = projects.slice(0, 6);
+const featured = shown;
+const mosaic = await Promise.all(projects.map(async project => (await getImage({ src: project.image, width: 480, format: 'webp', quality: 60 })).src));
+const ring = await Promise.all(shown.map(async project => ({ ...project, texture: (await getImage({ src: project.image, width: 1200, format: 'webp', quality: 72 })).src })));
+---
+<section class="section wrap" id="projects" aria-labelledby="projects-heading">
+  <div class="section-head" data-rise>
+    <h2 class="section-title" id="projects-heading">{content.projectsTitle}</h2>
+    {projects.length > shown.length && <a class="pill pill-big" href="/projects/">{content.ui.allProjects}</a>}
+  </div>
+
+  <!-- Запасной вариант без 3D: цветные карточки. При работающей 3D-сцене скрыты. -->
+  <ol class="cards" aria-label={content.ui.projectList}>
+    {featured.map((project, index) => <ProjectItem project={project} index={index} eager stacked />)}
+  </ol>
+
+  <!-- 3D-режим: экраны проектов летают в сцене, здесь только подписи к активному. -->
+  <div class="stage" data-stage style={`--n:${ring.length + 1}`}>
+    <div class="stage-sticky">
+      <div class="stage-drag" data-stage-drag aria-hidden="true"></div>
+      <p class="stage-count" aria-hidden="true"><span data-stage-count>01</span> / {String(ring.length).padStart(2, '0')}</p>
+      <ol class="stage-list" aria-label={content.ui.projectList}>
+        {ring.map((project, index) => (
+          <li class="stage-item" data-stage-item data-tex={project.texture} style={`--tone:${project.tone}`}>
+            <p class="stage-meta"><span>{String(index + 1).padStart(2, '0')}</span><span>{project.category}</span><span>{project.year}</span></p>
+            <h3><a href={project.demo}>{project.name}</a></h3>
+            <p class="stage-text">{project.description}</p>
+            <ul class="chips" aria-label={`Технологии проекта «${project.name}»`}>{project.technologies.map(technology => <li>{technology}</li>)}</ul>
+            <a class="pill pill-solid" href={project.demo}>{content.ui.demo}<span class="sr-only">: {project.name}</span></a>
+          </li>
+        ))}
+      </ol>
+      <!-- Последняя остановка ленты: в том же виде, что проекты. Справа «экран» с превью всех работ, слева подпись. -->
+      <div class="stage-end">
+        <a class="stage-end-frame" href="/projects/" tabindex="-1" aria-hidden="true">
+          {mosaic.map(src => <img src={src} alt="" loading="lazy" decoding="async" />)}
+        </a>
+      </div>
+      <div class="stage-item stage-end-item">
+        <p class="stage-meta"><span>{String(ring.length + 1).padStart(2, '0')}</span><span>Работ в портфолио: {projects.length}</span></p>
+        <h3><a href="/projects/">{content.ui.allProjects}</a></h3>
+        <p class="stage-text">{content.projectsNote}</p>
+        <a class="pill pill-solid" href="/projects/">{content.ui.allProjects}</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="more">
+    <a class="pill pill-big more-all" href="/projects/">{content.ui.allProjects}</a>
+    <p class="projects-note">{content.projectsNote}</p>
+  </div>
+</section>
+
+<style>
+  .more { display:flex; flex-wrap:wrap; align-items:center; gap:16px 32px; margin-top:clamp(28px,4vw,56px) }
+  .more .projects-note { margin:0 }
+  :global(.three-on) .more-all { display:none }
+</style>
