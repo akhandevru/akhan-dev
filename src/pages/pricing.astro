@@ -79,7 +79,6 @@ const faqSchema = {
         <p class="calc-label" id="calc-label">{calc.resultLabel}</p>
         <p class="calc-sum" aria-labelledby="calc-label" data-calc-sum>от {format(config.prices.single)}</p>
         <ul class="calc-lines" aria-label={calc.breakdownLabel} data-calc-lines><li><span>{single?.title}</span><span>{format(config.prices.single)}</span></li></ul>
-        <a class="calc-action" href="/contact/#message" data-calc-action>{calc.action}</a>
         <p class="calc-disclaimer">{calc.disclaimer}</p>
       </div>
     </div>
@@ -103,7 +102,6 @@ const faqSchema = {
 <script>
   // Калькулятор: сайт и бот это основное, админка и страницы дополнения. Цена страницы падает с их числом.
   // Правила: больше страниц, чем помещается в одностраничный сайт, значит многостраничный (он выбирается сам).
-  // Расчёт сохраняется в sessionStorage, чтобы страница контактов подставила его в заявку.
   interface Tier { from: number; price: number }
   type Key = 'single' | 'multi' | 'bot' | 'admin';
   interface Config {
@@ -157,10 +155,6 @@ const faqSchema = {
           li.append(label, cost);
           return li;
         }));
-        try {
-          if (total > 0) sessionStorage.setItem('akhan-estimate', JSON.stringify({ lines, total }));
-          else sessionStorage.removeItem('akhan-estimate');
-        } catch { /* хранилище недоступно: расчёт просто не попадёт в заявку */ }
       };
 
       const setPages = (value: number) => {
@@ -226,12 +220,8 @@ const faqSchema = {
   /* Строки создаёт скрипт, у них нет атрибута scoped-стилей Astro, поэтому :global. */
   .calc-lines :global(li) { display:flex; justify-content:space-between; align-items:baseline; gap:16px }
   .calc-lines :global(li span:last-child) { white-space:nowrap; font-variant-numeric:tabular-nums }
-  .calc-action { display:inline-flex; align-items:center; min-height:52px; margin-top:8px; padding:12px 28px; border-radius:999px; background:var(--panel-text); color:var(--panel-bg); font:600 15px/1.2 var(--sans) }
-  .calc-action:focus-visible { outline:2px solid var(--panel-text); outline-offset:4px }
   .calc-disclaimer { color:var(--panel-muted); font-size:13px; line-height:1.55 }
   @media (hover:hover) {
-    .calc-action { transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease }
-    .calc-action:hover { background:transparent; color:var(--panel-text); box-shadow:inset 0 0 0 1.5px var(--panel-text) }
   }
 
   /* Контурные слова. У переменного шрифта контуры внутри букв налегают друг на друга, и обычная обводка их показывает.
