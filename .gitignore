@@ -4,3 +4,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Локальные заметки для Claude Code: в репозиторий не попадают (там детали сервера)
+CLAUDE.md

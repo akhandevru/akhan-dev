@@ -11,7 +11,7 @@ export const siteConfig = {
   location: 'Ростов-на-Дону',
   country: 'RU',
   telegram: 'https://t.me/akhan_dev',
-  github: 'https://github.com/akhanderu',
+  github: 'https://github.com/akhandevru',
   source: 'https://github.com/akhandevru/akhan-dev',
   url: 'https://akhandev.ru',
   available: true,
