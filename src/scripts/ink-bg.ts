@@ -1,5 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { nearEnd } from './scroll-end';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -38,7 +39,7 @@ function run(target: HTMLCanvasElement, ctx: CanvasRenderingContext2D, section: 
   const frame = (now: number) => {
     requestAnimationFrame(frame);
     if (shown <= 0.01) { target.style.opacity = '0'; return; }
-    if (!visible || !image || now - last < 33) return;
+    if (!visible || !image || now - last < 33 || nearEnd()) return;
     last = now;
     const t = now / 1000;
     // Позиция и размер догоняют прокрутку с запозданием, поэтому капли движутся плавно, без рывков.

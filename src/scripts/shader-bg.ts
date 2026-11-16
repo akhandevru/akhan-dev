@@ -1,4 +1,4 @@
-export {};
+import { nearEnd } from './scroll-end';
 // Фон сайта: медленный почти чёрный градиент с мелким зерном, на обычном WebGL (работает в любом современном браузере и на телефоне).
 // Широкие мягкие полосы получаются из шума с искажением координат, зерно пересчитывается несколько раз в секунду.
 // Холст в половину размера экрана, CSS растягивает его вдвое, поэтому нагрузка маленькая. Нет WebGL, включено «меньше движения»
@@ -71,7 +71,7 @@ function run(target: HTMLCanvasElement) {
   const started = performance.now();
   const frame = (now: number) => {
     requestAnimationFrame(frame);
-    if (document.hidden || now - last < 33) return;
+    if (document.hidden || now - last < 33 || nearEnd()) return;
     last = now;
     gl.uniform1f(uTime, (now - started) / 1000);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
