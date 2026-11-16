@@ -1,6 +1,8 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { runIntro } from './intro';
+
 gsap.registerPlugin(ScrollTrigger);
 
 type Cleanup = (() => void) | void;
@@ -13,7 +15,8 @@ function heroScene(): Cleanup {
   const lines = gsap.utils.toArray<HTMLElement>('.hero .line-in');
   if (!hero || chars.length === 0) return;
   // Вход анимирует буквы, выход на прокрутке анимирует строки: так два твина не спорят за один элемент.
-  gsap.from(chars, { yPercent: 115, duration: 1.1, ease: 'expo.out', stagger: 0.055, delay: 0.15 });
+  // Вход имени и всей первой страницы ведёт scripts/intro.ts, чтобы не было мигания «сначала видно, потом прячется».
+  runIntro();
   gsap.to(lines, {
     yPercent: -115,
     ease: 'power2.in',

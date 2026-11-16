@@ -41,10 +41,6 @@ const lines = [first, rest.join(' ')];
   .hero-bottom { align-self:end; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:20px clamp(24px,4vw,64px) }
   .lead { max-width:32ch; font-size:clamp(20px,1.9vw,30px); line-height:1.35; font-weight:500; letter-spacing:-.02em; text-wrap:pretty }
 
-  @media (prefers-reduced-motion:no-preference) {
-    .hero-top,.hero-bottom { animation:hero-fade 900ms cubic-bezier(.16,1,.3,1) 500ms backwards }
-    @keyframes hero-fade { from { opacity:0; transform:translateY(14px) } }
-  }
   @media (max-width:900px) {
     .hero-bottom { grid-template-columns:1fr; align-items:start; gap:18px }
     .hero-bottom .pill { justify-self:start }

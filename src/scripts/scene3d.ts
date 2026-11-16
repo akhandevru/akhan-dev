@@ -2,6 +2,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { holeFragment } from './hole-shader';
 import { tilt } from './parallax';
+import { introActive, introBang, markHoleBorn } from './intro-state';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,6 +28,13 @@ const quadVertex = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4
 
 async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLElement) {
   const THREE = await import('three');
+  // Картинки проектов качаются заранее, пока звезда горит, чтобы после взрыва оставались только рендерер и первый кадр.
+  const loader = new THREE.TextureLoader();
+  const load = (url: string) => new Promise<InstanceType<typeof THREE.Texture>>((resolve, reject) => loader.load(url, resolve, undefined, reject));
+  const preloaded = items.map(item => load(item.dataset['tex'] ?? ''));
+  preloaded.forEach(promise => { promise.catch(() => undefined); });
+  // Рендерер и компиляция шейдера дыры тяжёлые: стартуем в момент взрыва звезды, вспышка скрывает возможные подвисания.
+  await introBang;
   const small = innerWidth < 700;
   const renderer = new THREE.WebGLRenderer({ canvas: target, antialias: !small, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 2 : 1.5));
@@ -40,13 +48,11 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
 
   const count = items.length;
   const W = 4, H = 2.5;
-  const loader = new THREE.TextureLoader();
-  const load = (url: string) => new Promise<InstanceType<typeof THREE.Texture>>((resolve, reject) => loader.load(url, resolve, undefined, reject));
   const anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
 
   type Panel = { group: InstanceType<typeof THREE.Group>; material: InstanceType<typeof THREE.MeshBasicMaterial>; frame: InstanceType<typeof THREE.MeshBasicMaterial>; texture: InstanceType<typeof THREE.Texture>; span: number; scroll: number; dir: number; hold: number; settled: number };
-  const panels: Panel[] = await Promise.all(items.map(async item => {
-    const texture = await load(item.dataset['tex'] ?? '');
+  const panels: Panel[] = await Promise.all(items.map(async (_item, index) => {
+    const texture = await preloaded[index]!;
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = anisotropy;
     const image = texture.image as { width: number; height: number };
@@ -165,6 +171,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
     moteGeometry.attributes['aSize']!.needsUpdate = true;
   };
 
+  let baseZoom = 0.68;
   const state = { b: 0, p: 0, out: 0 };
   let aspect = 1, visibleWidth = 8, visibleHeight = 5;
   const resize = () => {
@@ -184,7 +191,8 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
     holeUniforms.uRes.value.set(w, h);
     compositeMaterial.uniforms['uTexel']!.value.set(1 / w, 1 / h);
     // uZoom меньше 1 увеличивает дыру. На узком экране дыра вписывается по ширине.
-    holeUniforms.uZoom.value = aspect < 1 ? Math.max(0.9, 0.7 / aspect) : 0.68;
+    baseZoom = aspect < 1 ? Math.max(0.9, 0.7 / aspect) : 0.68;
+    holeUniforms.uZoom.value = baseZoom;
     holeUniforms.uShift.value.set(0, aspect < 1 ? -0.02 : -0.12);
   };
   resize();
@@ -198,7 +206,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
   ScrollTrigger.refresh();
 
   const began = performance.now();
-  let focusNow = 0, activeIndex = -1, shownIndex = -2, last = began, lastShift = 1e9, lastSize = 0, lastEnd = -1, cleared = false;
+  let focusNow = 0, activeIndex = -1, shownIndex = -2, last = began, lastShift = 1e9, lastSize = 0, lastEnd = -1, cleared = false, bornAt = 0;
 
   const frame = () => {
     requestAnimationFrame(frame);
@@ -286,7 +294,16 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
     if (Math.abs(end - lastEnd) > 0.004) { lastEnd = end; section.style.setProperty('--end', end.toFixed(3)); section.classList.toggle('at-end', end > 0.5); }
     target.style.opacity = '1';
 
-    const holeFade = 1 - smooth(state.b * 1.6);
+    // Дыра «зажигается» плавно с первого кадра сцены, а не появляется сразу.
+    if (!bornAt) { bornAt = now; markHoleBorn(); }
+    const age = (now - bornAt) / 1000;
+    // После взрыва дыра рождается маленькой и растёт (увеличиваем uZoom до обычного), потом вокруг неё проявляются кружащие частицы.
+    // Без вступления дыра просто плавно проявляется.
+    const grow = introActive ? 1 - (1 - clamp01(age / 2.8)) ** 3 : 1;
+    holeUniforms.uZoom.value = baseZoom * (1 + (1 - grow) * 3.4);
+    const appear = introActive ? smooth(age / 0.8) : smooth(age / 2.2);
+    const holeFade = (1 - smooth(state.b * 1.6)) * appear;
+    const motesFade = holeFade * (introActive ? smooth((age - 0.6) / 1.6) : 1);
     // Когда дыры уже не видно и лента вне экрана (читают «Как работаю», «Стоимость» и ниже), кадр не рисуется: холст остаётся пустым.
     if (holeFade <= 0.01 && !onScreen) {
       if (cleared) return;
@@ -309,7 +326,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
       renderer.render(holeScene, flat);
       renderer.setRenderTarget(null);
       renderer.render(composite, flat);
-      updateMotes(t, holeFade);
+      updateMotes(t, motesFade);
       renderer.render(moteScene, flat);
     }
     renderer.clearDepth();
@@ -357,6 +374,9 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
 }
 
 if (canvas && stage && hero && items.length > 0 && !calm && !saver && hasWebgl2) {
-  const run = () => { start(canvas, stage, hero).catch(() => { root.classList.remove('three-on'); canvas.remove(); }); };
+  const run = () => { start(canvas, stage, hero).catch(() => { root.classList.remove('three-on'); canvas.remove(); markHoleBorn(); }); };
   if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 2000 }); else setTimeout(run, 600);
+} else {
+  // Сцены не будет (нет WebGL2, «меньше движения» или экономия трафика): вступление не должно её ждать.
+  markHoleBorn();
 }

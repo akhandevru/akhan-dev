@@ -31,6 +31,7 @@
 
 <script>
   import { metrikaId, consentKey, consentVersion } from '../lib/analytics';
+  import { introDone } from '../scripts/intro-state';
 
   type Choice = 'granted' | 'denied';
   type YmFunction = { (...args: unknown[]): void; a?: IArguments[]; l?: number };
@@ -125,5 +126,6 @@
 
   const stored = readChoice();
   if (stored === 'granted') loadMetrika();
-  if (stored === null) show(false);
+  // На главной плашка появляется после вступительной анимации, а не поверх неё.
+  if (stored === null) introDone.then(() => show(false));
 </script>

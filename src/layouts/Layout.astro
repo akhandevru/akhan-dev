@@ -3,6 +3,8 @@ import { siteConfig, content } from '../config';
 import '@fontsource-variable/onest';
 import '@fontsource-variable/unbounded';
 import '@fontsource-variable/jetbrains-mono';
+import unboundedCyrillic from '@fontsource-variable/unbounded/files/unbounded-cyrillic-wght-normal.woff2?url';
+import onestCyrillic from '@fontsource-variable/onest/files/onest-cyrillic-wght-normal.woff2?url';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Menu from '../components/Menu.astro';
@@ -29,6 +31,26 @@ const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: 
     <meta name="author" content={siteConfig.name} />
     <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />
     <link rel="canonical" href={canonical} />
+    <!-- Шрифты первого экрана грузятся заранее: имя сразу рисуется нужным шрифтом, без подмены. -->
+    <link rel="preload" href={unboundedCyrillic} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={onestCyrillic} as="font" type="font/woff2" crossorigin />
+    <!-- Вступительная анимация главной (звезда взрывается и рождается чёрная дыра): класс intro закрывает страницу чёрным экраном с первого кадра
+         и блокирует прокрутку, scripts/intro.ts его снимает. Показывается не чаще раза в час (метка времени в localStorage, ключ akhan-intro);
+         адрес /?intro показывает её принудительно. Не играет при «меньше движения» и без JavaScript. Страховка: через 10 секунд класс снимается сам. -->
+    <script is:inline>
+      (function () {
+        try {
+          var root = document.documentElement, key = 'akhan-intro', now = Date.now(), last = 0;
+          try { last = +localStorage.getItem(key) || 0; } catch (e) {}
+          var force = /[?&]intro(=|&|$)/.test(location.search);
+          if (location.pathname === '/' && !matchMedia('(prefers-reduced-motion: reduce)').matches && (force || now - last > 3600000)) {
+            root.classList.add('intro');
+            try { localStorage.setItem(key, String(now)); } catch (e) {}
+            setTimeout(function () { root.classList.remove('intro'); }, 10000);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -56,6 +78,9 @@ const graph = buildGraph({ path: Astro.url.pathname, title, description, extra: 
     <script type="application/ld+json" set:html={JSON.stringify(graph).replace(/</g, '\\u003c')} />
   </head>
   <body id="top">
+    <div class="intro-veil" aria-hidden="true"></div>
+    <canvas class="intro-star" aria-hidden="true"></canvas>
+    <canvas class="intro-canvas" aria-hidden="true"></canvas>
     <canvas class="bg-shader" aria-hidden="true" data-bg-shader></canvas>
     <canvas class="ink-bg" aria-hidden="true" data-ink></canvas>
     <canvas class="three-canvas" aria-hidden="true" data-three></canvas>
