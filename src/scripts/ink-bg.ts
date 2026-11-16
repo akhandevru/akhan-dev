@@ -38,7 +38,8 @@ function run(target: HTMLCanvasElement, ctx: CanvasRenderingContext2D, section: 
   const frame = (now: number) => {
     requestAnimationFrame(frame);
     if (shown <= 0.01) { target.style.opacity = '0'; return; }
-    if (!visible || !image || now - last < 33) return;
+    // 30 кадров в секунду на компьютере, 20 на телефоне: поле считается на процессоре и мешает прокрутке.
+    if (!visible || !image || now - last < (innerWidth < 700 ? 50 : 33)) return;
     last = now;
     const t = now / 1000;
     // Позиция и размер догоняют прокрутку с запозданием, поэтому капли движутся плавно, без рывков.

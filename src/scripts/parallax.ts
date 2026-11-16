@@ -4,7 +4,8 @@
 export const tilt = { x: 0, y: 0 };
 
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const root = document.documentElement;
+// Переменные ставятся только на холсты фона: на корне каждое изменение заставляло браузер пересчитывать стили всей страницы.
+const targets = [...document.querySelectorAll<HTMLElement>('.bg-shader, .ink-bg')];
 const goal = { x: 0, y: 0 };
 const clamp = (v: number) => Math.max(-1, Math.min(1, v));
 
@@ -42,8 +43,10 @@ if (!calm) {
     tilt.y += (goal.y - tilt.y) * 0.06;
     if (Math.abs(tilt.x - shownX) > 0.002 || Math.abs(tilt.y - shownY) > 0.002) {
       shownX = tilt.x; shownY = tilt.y;
-      root.style.setProperty('--tilt-x', shownX.toFixed(3));
-      root.style.setProperty('--tilt-y', shownY.toFixed(3));
+      targets.forEach(element => {
+        element.style.setProperty('--tilt-x', shownX.toFixed(3));
+        element.style.setProperty('--tilt-y', shownY.toFixed(3));
+      });
     }
   };
   requestAnimationFrame(frame);

@@ -243,3 +243,5 @@ kbd { font:11px var(--mono) }
   .stage-text { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden }
 }
 .ink-bg { position:fixed; left:-2vw; top:-2vh; z-index:-1; width:104vw; height:104vh; opacity:0; pointer-events:none; filter:blur(4px); transform:translate3d(calc(var(--tilt-x,0) * -14px),calc(var(--tilt-y,0) * -10px),0) }
+/* На телефоне размытие полноэкранного холста дорогое, а холст и так маленький и растягивается мягко. */
+@media(max-width:900px) { .ink-bg { filter:none } }

@@ -37,7 +37,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
   await introBang;
   const small = innerWidth < 700;
   const renderer = new THREE.WebGLRenderer({ canvas: target, antialias: !small, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 2 : 1.5));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.autoClear = false;
@@ -116,7 +116,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
 
   // Частицы вокруг дыры: отдельные пылинки на кеплеровских орбитах в плоскости диска. Их положение считается в JS
   // в той же камере, что у шейдера дыры, и рисуется точками поверх неё. Пылинки за тенью дыры скрыты.
-  const MOTES = 640;
+  const MOTES = small ? 380 : 640;
   const moteOrbit = Array.from({ length: MOTES }, () => {
     const r = 3.1 + Math.random() ** 1.15 * 13;
     const loose = Math.random() < 0.35;
@@ -172,6 +172,8 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
   };
 
   let baseZoom = 0.68;
+  // Адаптивная нагрузка: если кадры идут медленно (слабый телефон), разрешение дыры снижается ступенями до 55%, на мощных устройствах остаётся полным.
+  let holeQuality = 1, frameAvg = 1 / 60, framesSeen = 0, holeTick = 0;
   const state = { b: 0, p: 0, out: 0 };
   let aspect = 1, visibleWidth = 8, visibleHeight = 5;
   const resize = () => {
@@ -185,7 +187,7 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
     // Разрешение дыры считается от реальной плотности пикселей экрана (на ретине и телефоне выше), но не больше
     // примерно 1,7 млн пикселей, чтобы большой монитор не тормозил. Раньше было 0,6-0,7 от CSS-пикселей, и дыра шла квадратами.
     const dense = Math.min(Math.max(devicePixelRatio * 0.62, 0.8), small ? 1.1 : 0.95);
-    const scale = Math.min(dense, Math.sqrt(1.7e6 / (innerWidth * innerHeight)));
+    const scale = Math.min(dense, Math.sqrt(1.7e6 / (innerWidth * innerHeight))) * holeQuality;
     const w = Math.max(64, Math.round(innerWidth * scale)), h = Math.max(64, Math.round(innerHeight * scale));
     holeTarget.setSize(w, h);
     holeUniforms.uRes.value.set(w, h);
@@ -212,7 +214,8 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
     requestAnimationFrame(frame);
     if (document.hidden || state.out >= 0.999) { target.style.opacity = '0'; return; }
     const now = performance.now();
-    const dt = Math.min(0.05, (now - last) / 1000);
+    const rawDt = (now - last) / 1000;
+    const dt = Math.min(0.05, rawDt);
     last = now;
     const t = (now - began) / 1000;
     const damp = 1 - Math.exp(-dt * 5);
@@ -313,6 +316,14 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
       return;
     }
     cleared = false;
+    // Замер частоты кадров только пока рисуется дыра, и не во время вступления (там тяжёлый запуск).
+    if (holeFade > 0.01 && age > 4 && rawDt < 0.5) {
+      frameAvg += (rawDt - frameAvg) * 0.06;
+      if (++framesSeen % 60 === 0 && frameAvg > 0.021 && holeQuality > 0.56) {
+        holeQuality = Math.max(0.55, holeQuality * 0.82);
+        resize();
+      }
+    }
     renderer.setRenderTarget(null);
     renderer.clear();
     if (holeFade > 0.01) {
@@ -321,10 +332,13 @@ async function start(target: HTMLCanvasElement, section: HTMLElement, top: HTMLE
       holeUniforms.uElev.value = 0.13 + tilt.y * 0.05;
       holeUniforms.uShift.value.x = -tilt.x * 0.025;
       holeUniforms.uFade.value = holeFade;
-      renderer.setRenderTarget(holeTarget);
-      renderer.clear();
-      renderer.render(holeScene, flat);
-      renderer.setRenderTarget(null);
+      // На телефоне тяжёлый проход дыры считается через кадр (30 раз в секунду): диск вращается медленно, разницы не видно, а нагрузка вдвое меньше.
+      if (!small || ++holeTick % 2 === 0 || framesSeen < 3) {
+        renderer.setRenderTarget(holeTarget);
+        renderer.clear();
+        renderer.render(holeScene, flat);
+        renderer.setRenderTarget(null);
+      }
       renderer.render(composite, flat);
       updateMotes(t, motesFade);
       renderer.render(moteScene, flat);
