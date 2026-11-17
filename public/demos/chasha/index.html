@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Чаща - кофе и травяные напитки</title>
+  <meta name="description" content="Демо сайта кофейни: травяные напитки и кофе холодной экстракции, меню, онлайн-заказ к выбранному времени.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#04100f">
+  <link rel="icon" href="/demos/chasha/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/demos/chasha/assets/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/demos/chasha/styles.css">
+  <link rel="stylesheet" href="/demos/concept.css">
+  <script src="/demos/concept.js" defer></script>
+  <script type="module" src="/demos/chasha/home.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+  <div class="hud" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <header class="bar">
+    <a class="brand" href="/demos/chasha/index.html" aria-label="Чаща, на главную"><span class="glyph" aria-hidden="true"></span>Чаща</a>
+    <nav class="nav" aria-label="Основная">
+      <a href="/demos/chasha/menu.html">Меню</a>
+      <a href="/demos/chasha/index.html#ritual">Ритуал</a>
+      <a href="/demos/chasha/index.html#ingredients">Состав</a>
+      <a href="/demos/chasha/index.html#places">Точки</a>
+    </nav>
+    <div class="right">
+      <a class="cart-link" href="/demos/chasha/order.html">Корзина <b data-cart-count>0</b></a>
+      <button class="menu-btn" type="button" aria-label="Открыть меню"><span></span></button>
+    </div>
+  </header>
+  <dialog class="menu" id="menu" aria-label="Меню">
+    <nav aria-label="Мобильная">
+      <a href="/demos/chasha/menu.html">Меню</a>
+      <a href="/demos/chasha/index.html#ritual">Ритуал</a>
+      <a href="/demos/chasha/index.html#ingredients">Состав</a>
+      <a href="/demos/chasha/index.html#places">Точки</a>
+      <a href="/demos/chasha/order.html">Заказ</a>
+    </nav>
+    <button class="btn btn-line btn-sm close" type="button">Закрыть</button>
+  </dialog>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="title">
+      <img class="l-left" src="/demos/chasha/assets/f-fern-left.webp" width="1600" height="2133" alt="">
+      <img class="l-right" src="/demos/chasha/assets/f-fern-right.webp" width="1600" height="960" alt="">
+      <img class="l-drink" src="/demos/chasha/assets/d-turquoise.webp" width="1100" height="1601" alt="Высокий стакан с бирюзовым лимонадом, мятой и лимоном" fetchpriority="high">
+      <img class="l-top" src="/demos/chasha/assets/f-fern-top.webp" width="1600" height="1067" alt="">
+      <h1 class="words" id="title"><span>Вдохни</span><span>лес</span></h1>
+      <i class="drop" style="--x:31%;--d:0s" aria-hidden="true"></i><i class="drop" style="--x:68%;--d:3.2s" aria-hidden="true"></i><i class="drop" style="--x:79%;--d:5.4s" aria-hidden="true"></i>
+      <div class="hero-foot"><div class="wrap">
+        <p>Травяные напитки и кофе холодной экстракции. Собираем вручную, заказывайте к нужному времени.</p>
+        <a class="btn" href="/demos/chasha/menu.html">Выбрать напиток</a>
+      </div></div>
+    </section>
+
+    <section class="band" id="ritual" aria-labelledby="h-ritual">
+      <img class="bg" src="/demos/chasha/assets/f-moss.webp" width="1600" height="2400" alt="" loading="lazy">
+      <div class="wrap">
+        <div class="band-head"><span class="label">Как мы готовим</span><h2 class="h-xl" id="h-ritual">Ритуал</h2><p>Каждый напиток проходит три шага. Мы не торопим ни один из них.</p></div>
+        <ol class="steps">
+          <li class="glass"><span class="time">До рассвета</span><h3>Собрать</h3><p>Травы и ягоды привозят ранним утром с ферм и лесных участков. Мы берём только то, что собрали вчера.</p></li>
+          <li class="glass"><span class="time">14 часов</span><h3>Настоять</h3><p>Кофе и чай настаиваются в холоде. Так вкус получается чистым, а кислота мягкой.</p></li>
+          <li class="glass"><span class="time">За 2 минуты</span><h3>Подать</h3><p>Собираем напиток при вас, добавляем свежую зелень и лёд. Стакан тёплый только от рук.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="band" id="ingredients" aria-labelledby="h-ingr">
+      <img class="bg" src="/demos/chasha/assets/f-fern-top.webp" width="1600" height="1067" alt="" loading="lazy">
+      <div class="wrap">
+        <div class="band-head"><span class="label">Откуда вкус</span><h2 class="h-xl" id="h-ingr">Состав</h2><p>Шесть ингредиентов, на которых держится меню. У каждого есть место и сезон.</p></div>
+        <div class="ingr">
+          <ul class="ingr-list" id="ingr-list" role="tablist" aria-orientation="vertical" aria-label="Ингредиенты"></ul>
+          <div class="ingr-detail glass" id="ingr-panel" role="tabpanel" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shelf-wrap" aria-labelledby="h-feat"><div class="wrap">
+      <div class="band-head"><span class="label">Сегодня на баре</span><h2 class="h-xl" id="h-feat">Напитки дня</h2></div>
+      <ul class="shelf" id="featured" aria-label="Напитки дня"></ul>
+      <p style="margin-top:36px"><a class="btn btn-line" href="/demos/chasha/menu.html">Всё меню</a></p>
+    </div></section>
+
+    <section class="sec" id="places" aria-labelledby="h-places"><div class="wrap">
+      <div class="band-head"><span class="label">Где забрать</span><h2 class="h-xl" id="h-places">Точки</h2><p>Заказывайте на сайте и забирайте без очереди. Время приготовления зависит от числа напитков.</p></div>
+      <ul class="places" id="places-list"></ul>
+    </div></section>
+
+    <section class="final" aria-labelledby="h-final"><div class="wrap">
+      <h2 id="h-final">Заказ до входа</h2>
+      <p>Выберите напиток, точку и время. Бариста начнёт готовить к вашему приходу.</p>
+      <a class="btn" href="/demos/chasha/menu.html">Начать заказ</a>
+    </div></section>
+  </main>
+  <footer class="foot">
+    <div class="wrap foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/demos/chasha/index.html" aria-label="Чаща, на главную"><span class="glyph" aria-hidden="true"></span>Чаща</a>
+        <p>Травяные напитки и кофе холодной экстракции. Собираем вручную, готовим к вашему приходу.</p>
+      </div>
+      <nav class="foot-col" aria-label="Разделы"><h2>Разделы</h2><a href="/demos/chasha/menu.html">Меню</a><a href="/demos/chasha/index.html#ritual">Ритуал</a><a href="/demos/chasha/index.html#ingredients">Состав</a><a href="/demos/chasha/order.html">Заказ</a></nav>
+      <div class="foot-col"><h2>Точки</h2><a href="/demos/chasha/order.html?point=lesnaya">Лесная, 12</a><a href="/demos/chasha/order.html?point=park">Парк, павильон 3</a><a href="/demos/chasha/order.html?point=vokzal">Вокзал, 1 этаж</a></div>
+      <div class="foot-col"><h2>Связь</h2><a href="tel:+70000000000">+7 000 000-00-00</a><a href="mailto:hello@chasha.example">hello@chasha.example</a><span>Ежедневно с 8 до 22</span></div>
+    </div>
+    <p class="foot-big" aria-hidden="true">Чаща</p>
+  </footer>
+  <footer class="akhan-concept-footer"><p>Концепт-сайт. Кофейня, напитки, цены и адреса вымышлены, заказы не отправляются. Фото: Unsplash. Дизайн и разработка: <a href="/">akhandev</a></p></footer>
+</body>
+</html>

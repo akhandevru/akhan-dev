@@ -8,6 +8,7 @@ import umlaut from '../assets/projects/umlaut.png';
 import socvetie from '../assets/projects/socvetie.png';
 import poltarelki from '../assets/projects/poltarelki.png';
 import yarus from '../assets/projects/yarus.png';
+import chasha from '../assets/projects/chasha.png';
 
 export interface Project {
   id: string;
@@ -27,6 +28,15 @@ export interface Project {
 
 /** Демонстрационные интерфейсы. Названия компаний, адреса и контакты вымышлены. */
 export const projects: Project[] = [
+  {
+    id: 'chasha', name: 'Чаща', category: 'Кофейня и травяные напитки',
+    description: 'Сайт кофейни в тёмном лесу: гигантская надпись по бокам от стакана и подписи на линиях. У каждого напитка свой цветной экран в меню, а заказ собирается в бумажный чек.',
+    technologies: ['HTML', 'CSS', 'JavaScript'], image: chasha,
+    previewLabel: 'chasha.example', demo: '/demos/chasha/index.html', year: '2026',
+    scope: ['Слоистый первый экран с листвой и мягким параллаксом', 'Меню-сцена: свой цвет и название на весь экран у каждого напитка', 'Параметры, чек-корзина и заказ к времени на точку'],
+
+    tone: '#04100f', dark: true,
+  },
   {
     id: 'yarus', name: 'Ярус', category: 'Жилой комплекс',
     description: 'Сайт премиального квартала в сумерках: гигантское слово за силуэтом города, светлый каталог с карточками квартир, ипотечный калькулятор и запись на показ.',
