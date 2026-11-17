@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Квартиры - Ярус</title>
+  <meta name="description" content="Демо сайта жилого комплекса: шахматка квартир трёх башен с фильтрами и ценами.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#0b1020">
+  <link rel="icon" href="/demos/yarus/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/demos/yarus/assets/geologica-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/demos/yarus/styles.css">
+  <link rel="stylesheet" href="/demos/concept.css">
+  <script src="/demos/concept.js" defer></script>
+  <script type="module" src="/demos/yarus/apartments.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+  <div class="head"><div class="wrap">
+    <header class="top">
+      <a class="logo glass" href="/demos/yarus/index.html" aria-label="Ярус, на главную">ЯРУС</a>
+      <nav class="nav glass" aria-label="Основная">
+        <a href="/demos/yarus/index.html">О доме</a>
+        <a href="/demos/yarus/apartments.html" aria-current="page">Квартиры</a>
+        <a href="/demos/yarus/mortgage.html">Ипотека</a>
+      </nav>
+      <a class="btn btn-coral btn-sm" href="/demos/yarus/contacts.html">Записаться на показ</a>
+    </header>
+  </div></div>
+
+  <main id="main" class="page wrap">
+    <div class="page-head">
+      <h1>Квартиры</h1>
+      <p>339 квартир в трёх башнях. Выберите башню, спальни и бюджет, и подходящие варианты появятся сразу.</p>
+    </div>
+    <form class="card search" id="filters">
+      <div class="search-top">
+        <div class="seg" id="tabs" role="radiogroup" aria-label="Башня"></div>
+        <button class="plain-btn" type="reset">Сбросить фильтры</button>
+      </div>
+      <div class="search-row">
+        <fieldset class="field">
+          <legend>Спальни</legend>
+          <div class="chips">
+            <label class="chip"><input type="checkbox" name="beds" value="1"><span>1</span></label>
+            <label class="chip"><input type="checkbox" name="beds" value="2"><span>2</span></label>
+            <label class="chip"><input type="checkbox" name="beds" value="3"><span>3</span></label>
+            <label class="chip"><input type="checkbox" name="beds" value="4"><span>4</span></label>
+            <label class="chip"><input type="checkbox" name="beds" value="pent"><span>Пентхаус</span></label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="price">Цена до <output id="price-out" for="price"></output></label>
+          <input type="range" id="price" name="price" step="5">
+        </div>
+        <div class="field">
+          <label for="area">Площадь от <output id="area-out" for="area"></output></label>
+          <input type="range" id="area" name="area" min="45" max="290" step="5" value="45">
+        </div>
+        <div class="field">
+          <label for="view">Вид из окон</label>
+          <select id="view" name="view">
+            <option value="">Любой</option>
+            <option>Река</option>
+            <option>Парк</option>
+            <option>Город</option>
+            <option>Двор</option>
+          </select>
+        </div>
+      </div>
+      <label class="check"><input type="checkbox" name="free" id="free">Только свободные</label>
+    </form>
+    <div class="results-bar">
+      <p class="found" id="found" aria-live="polite"></p>
+      <div class="results-tools">
+        <div class="seg" role="radiogroup" aria-label="Вид списка" id="mode">
+          <label><input type="radio" name="mode" value="cards" checked><span>Карточки</span></label>
+          <label><input type="radio" name="mode" value="board"><span>Шахматка</span></label>
+        </div>
+        <select id="sort" aria-label="Сортировка">
+          <option value="price-asc">Сначала дешевле</option>
+          <option value="price-desc">Сначала дороже</option>
+          <option value="area-desc">Сначала просторнее</option>
+          <option value="floor-desc">Сначала выше</option>
+        </select>
+      </div>
+    </div>
+    <div id="cards" class="grid"></div>
+    <div class="more"><button class="btn btn-line" type="button" id="more">Показать ещё</button></div>
+    <div class="card board-wrap" id="boardwrap" hidden>
+      <div class="preview" id="preview"><span>Наведите на квартиру, чтобы увидеть детали</span></div>
+      <div class="board" id="board"></div>
+      <p class="legend"><span><i class="free"></i>Свободна</span><span><i class="hold"></i>Бронь</span><span><i class="sold"></i>Продана</span><span>В ячейке площадь, м²</span></p>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <a class="logo" href="/demos/yarus/index.html" aria-label="Ярус, на главную">ЯРУС</a>
+      <div class="foot-links"><span>Москва, Ярусная набережная, 7</span><a href="tel:+70000000000">+7 000 000-00-00</a><a href="mailto:sales@yarus.example">sales@yarus.example</a></div>
+    </div>
+  </footer>
+  <footer class="akhan-concept-footer"><p>Концепт-сайт. Квартал, квартиры, цены и адрес вымышлены, заявки не отправляются. Фото: Unsplash. Дизайн и разработка: <a href="/">akhandev</a></p></footer>
+</body>
+</html>

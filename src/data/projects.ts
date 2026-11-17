@@ -7,6 +7,7 @@ import shov from '../assets/projects/shov.png';
 import umlaut from '../assets/projects/umlaut.png';
 import socvetie from '../assets/projects/socvetie.png';
 import poltarelki from '../assets/projects/poltarelki.png';
+import yarus from '../assets/projects/yarus.png';
 
 export interface Project {
   id: string;
@@ -26,6 +27,15 @@ export interface Project {
 
 /** Демонстрационные интерфейсы. Названия компаний, адреса и контакты вымышлены. */
 export const projects: Project[] = [
+  {
+    id: 'yarus', name: 'Ярус', category: 'Жилой комплекс',
+    description: 'Сайт премиального квартала в сумерках: гигантское слово за силуэтом города, светлый каталог с карточками квартир, ипотечный калькулятор и запись на показ.',
+    technologies: ['HTML', 'CSS', 'JavaScript'], image: yarus,
+    previewLabel: 'yarus.example', demo: '/demos/yarus/index.html', year: '2026',
+    scope: ['Слоистый первый экран с параллаксом на CSS', 'Шахматка квартир с фильтрами и планировками', 'Ипотека по трём программам и запись на показ'],
+
+    tone: '#0b1020', dark: true,
+  },
   {
     id: 'poltarelki', name: 'Полтарелки', category: 'Доставка здоровой еды',
     description: 'Сервис доставки по всей России в контрастном зелёном и белом. Срок и цена по городу, расчёт рациона по калориям и оформление заказа.',

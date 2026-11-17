@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ипотека - Ярус</title>
+  <meta name="description" content="Демо сайта жилого комплекса: калькулятор ипотеки по трём программам с расчётом платежа и переплаты.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#0b1020">
+  <link rel="icon" href="/demos/yarus/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/demos/yarus/assets/geologica-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/demos/yarus/styles.css">
+  <link rel="stylesheet" href="/demos/concept.css">
+  <script src="/demos/concept.js" defer></script>
+  <script type="module" src="/demos/yarus/mortgage.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+  <div class="head"><div class="wrap">
+    <header class="top">
+      <a class="logo glass" href="/demos/yarus/index.html" aria-label="Ярус, на главную">ЯРУС</a>
+      <nav class="nav glass" aria-label="Основная">
+        <a href="/demos/yarus/index.html">О доме</a>
+        <a href="/demos/yarus/apartments.html">Квартиры</a>
+        <a href="/demos/yarus/mortgage.html" aria-current="page">Ипотека</a>
+      </nav>
+      <a class="btn btn-coral btn-sm" href="/demos/yarus/contacts.html">Записаться на показ</a>
+    </header>
+  </div></div>
+
+  <main id="main" class="page wrap">
+    <div class="page-head">
+      <h1>Ипотека</h1>
+      <p>Расчёт ориентировочный: точную ставку и платёж назовёт банк после одобрения заявки.</p>
+    </div>
+    <div class="mort">
+      <form class="card mort-form" id="mort">
+        <fieldset class="programs" id="programs"><legend>Программа</legend></fieldset>
+        <div class="field">
+          <label for="price">Стоимость квартиры, ₽</label>
+          <div class="money"><input class="input" id="price" name="price" inputmode="numeric" autocomplete="off" aria-describedby="price-err"></div>
+          <p class="err" id="price-err" hidden></p>
+        </div>
+        <div class="field">
+          <label for="down">Первый взнос <output id="down-out" for="down"></output></label>
+          <input type="range" id="down" name="down" min="20" max="90" step="5" value="30">
+        </div>
+        <div class="field">
+          <label for="years">Срок <output id="years-out" for="years"></output></label>
+          <input type="range" id="years" name="years" min="5" max="30" step="1" value="20">
+        </div>
+      </form>
+      <aside class="result" aria-live="polite" id="result"></aside>
+    </div>
+    <section class="steps-sec" aria-labelledby="steps-title">
+      <h2 id="steps-title">Как проходит покупка</h2>
+      <ol class="steps">
+        <li class="card"><b>Бронь</b><span>Квартира закрепляется за вами на 14 дней, бронь бесплатная.</span></li>
+        <li class="card"><b>Одобрение</b><span>Менеджер отправит заявку в три банка, ответ приходит за 1-3 дня.</span></li>
+        <li class="card"><b>Сделка</b><span>Договор долевого участия, деньги на эскроу-счёте до сдачи дома.</span></li>
+        <li class="card"><b>Ключи</b><span>Приёмка квартиры с инженером и передача ключей во II квартале 2028 года.</span></li>
+      </ol>
+    </section>
+  </main>
+  <footer class="foot">
+    <div class="wrap">
+      <a class="logo" href="/demos/yarus/index.html" aria-label="Ярус, на главную">ЯРУС</a>
+      <div class="foot-links"><span>Москва, Ярусная набережная, 7</span><a href="tel:+70000000000">+7 000 000-00-00</a><a href="mailto:sales@yarus.example">sales@yarus.example</a></div>
+    </div>
+  </footer>
+  <footer class="akhan-concept-footer"><p>Концепт-сайт. Квартал, квартиры, цены и адрес вымышлены, заявки не отправляются. Фото: Unsplash. Дизайн и разработка: <a href="/">akhandev</a></p></footer>
+</body>
+</html>

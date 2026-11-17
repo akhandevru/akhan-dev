@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ярус - клубный квартал у реки</title>
+  <meta name="description" content="Демо сайта жилого комплекса: три башни у реки, пентхаусы на верхних этажах, клубный этаж с бассейном, шахматка квартир и запись на показ.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#0b1020">
+  <link rel="icon" href="/demos/yarus/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/demos/yarus/assets/geologica-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/demos/yarus/assets/hero-sky.webp" as="image" type="image/webp">
+  <link rel="stylesheet" href="/demos/yarus/styles.css">
+  <link rel="stylesheet" href="/demos/concept.css">
+  <script src="/demos/concept.js" defer></script>
+  <script type="module" src="/demos/yarus/home.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">К содержимому</a>
+  <div class="head"><div class="wrap">
+    <header class="top">
+      <a class="logo glass" href="/demos/yarus/index.html" aria-label="Ярус, на главную">ЯРУС</a>
+      <nav class="nav glass" aria-label="Основная">
+        <a href="/demos/yarus/index.html" aria-current="page">О доме</a>
+        <a href="/demos/yarus/apartments.html">Квартиры</a>
+        <a href="/demos/yarus/mortgage.html">Ипотека</a>
+      </nav>
+      <a class="btn btn-coral btn-sm" href="/demos/yarus/contacts.html">Записаться на показ</a>
+    </header>
+  </div></div>
+  <div class="meter glass" id="meter" aria-hidden="true"><span>Этаж</span><b id="meter-num">32</b></div>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="title">
+      <div class="stage">
+        <div class="layer sky"><img src="/demos/yarus/assets/hero-sky.webp" width="2000" height="1125" alt="" fetchpriority="high"></div>
+        <div class="headline">
+          <p class="kicker">Клубный квартал</p>
+          <h1 id="title" aria-label="Ярус"><span style="--i:0" aria-hidden="true">Я</span><span style="--i:1" aria-hidden="true">р</span><span style="--i:2" aria-hidden="true">у</span><span style="--i:3" aria-hidden="true">с</span></h1>
+        </div>
+        <div class="layer city"><img src="/demos/yarus/assets/hero-city.webp" width="2000" height="1125" alt="Силуэт башен на фоне вечернего неба" fetchpriority="high"></div>
+      </div>
+      <div class="hero-copy"><div class="wrap">
+        <p>Три башни у реки, 339 квартир и пентхаусы на верхних этажах. Сдача во втором квартале 2028 года.</p>
+        <div class="cta-row">
+          <a class="btn btn-white" href="/demos/yarus/apartments.html">Выбрать квартиру</a>
+          <a class="btn btn-glass" href="/demos/yarus/mortgage.html">Рассчитать ипотеку</a>
+        </div>
+      </div></div>
+    </section>
+
+    <div class="sheet">
+      <section class="sec" aria-labelledby="s-lead"><div class="wrap two rise">
+        <div class="copy">
+          <h2 id="s-lead">Дом, в котором потолки выше обычного</h2>
+          <p class="lead">Потолки от 3,3 метра, окна от пола до потолка, подземный паркинг на 410 мест и двор, где нет машин. Отделка под ключ в двух палитрах на выбор.</p>
+          <a class="btn btn-ink" href="/demos/yarus/apartments.html">Все квартиры</a>
+        </div>
+        <figure class="photo"><img src="/demos/yarus/assets/terrace.webp" width="1800" height="1012" alt="Терраса с бассейном на крыше в сумерках" loading="lazy"></figure>
+      </div></section>
+
+      <section class="over" data-floor="31" aria-labelledby="s-pent">
+        <div class="over-photo">
+          <img src="/demos/yarus/assets/penthouse.webp" width="1800" height="1200" alt="Бассейн на террасе под звёздным небом" loading="lazy">
+          <span class="giant" aria-hidden="true">Пентхаус</span>
+        </div>
+        <div class="wrap over-info rise">
+          <div class="copy">
+            <h2 id="s-pent">Три верхних этажа отданы пентхаусам</h2>
+            <p>Шесть квартир от 241 до 286 м² с террасами на две стороны и потолками 4,2 метра. Лифт открывается прямо в прихожую.</p>
+          </div>
+          <p class="price">Пентхаусы<b data-from="pent"></b></p>
+        </div>
+      </section>
+
+      <section class="sec" data-floor="20" aria-labelledby="s-res"><div class="wrap two flip rise">
+        <figure class="photo"><img src="/demos/yarus/assets/living.webp" width="1800" height="1200" alt="Гостиная с панорамными окнами и тёплым светом" loading="lazy"></figure>
+        <div class="copy">
+          <h2 id="s-res">Квартиры от 49 до 171 м²</h2>
+          <p class="lead">В трёх башнях 333 квартиры с одной, двумя, тремя и четырьмя спальнями. На шахматке видно свободные и забронированные, а цена считается сразу.</p>
+          <ul class="types" id="types"></ul>
+          <a class="btn btn-ink" href="/demos/yarus/apartments.html">Открыть каталог</a>
+        </div>
+      </div></section>
+
+      <section class="club" data-floor="3" aria-labelledby="s-club">
+        <img src="/demos/yarus/assets/pool.webp" width="1800" height="1350" alt="Бассейн на третьем этаже с видом на ночной город" loading="lazy">
+        <div class="wrap">
+          <h2 id="s-club" class="rise">Третий этаж принадлежит жителям</h2>
+          <dl class="amen rise">
+            <div><dt>Бассейн</dt><dd>25 метров, четыре дорожки, открыт с 7 до 23</dd></div>
+            <div><dt>Хаммам</dt><dd>Сауна, купель и комната отдыха</dd></div>
+            <div><dt>Библиотека</dt><dd>Читальный зал и кабинеты для работы</dd></div>
+            <div><dt>Детский клуб</dt><dd>Игровая и занятия с педагогами</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="sec" data-floor="1" aria-labelledby="s-lobby"><div class="wrap two rise">
+        <div class="copy">
+          <h2 id="s-lobby">Лобби высотой шесть метров</h2>
+          <p class="lead">Консьерж встречает гостей и принимает посылки круглые сутки. Машины остаются под землёй, а во дворе только сад и пруд.</p>
+          <a class="btn btn-line" href="/demos/yarus/contacts.html">Приехать на показ</a>
+        </div>
+        <figure class="photo"><img src="/demos/yarus/assets/lobby.webp" width="1800" height="1200" alt="Лобби с садом и вечерним светом" loading="lazy"></figure>
+      </div></section>
+    </div>
+
+    <section class="final" data-floor="0" aria-labelledby="s-final">
+      <span class="giant" aria-hidden="true">Ярус</span>
+      <div class="wrap">
+        <h2 id="s-final" class="sr">Записаться на показ</h2>
+        <p>В шоуруме стоит макет квартала и квартира с отделкой в натуральную величину. Открыто каждый день с 10 до 21.</p>
+        <div class="cta-row">
+          <a class="btn btn-coral" href="/demos/yarus/contacts.html">Записаться на показ</a>
+          <a class="btn btn-glass" href="tel:+70000000000">+7 000 000-00-00</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <a class="logo" href="/demos/yarus/index.html" aria-label="Ярус, на главную">ЯРУС</a>
+      <div class="foot-links"><span>Москва, Ярусная набережная, 7</span><a href="tel:+70000000000">+7 000 000-00-00</a><a href="mailto:sales@yarus.example">sales@yarus.example</a></div>
+    </div>
+  </footer>
+  <footer class="akhan-concept-footer"><p>Концепт-сайт. Квартал, квартиры, цены и адрес вымышлены, заявки не отправляются. Фото: Unsplash. Дизайн и разработка: <a href="/">akhandev</a></p></footer>
+</body>
+</html>
