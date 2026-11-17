@@ -5,7 +5,11 @@ import { content } from '../config';
 import { projects } from '../data/projects';
 const shown = projects.slice(0, 6);
 const featured = shown;
-const mosaic = await Promise.all(projects.map(async project => (await getImage({ src: project.image, width: 480, format: 'webp', quality: 60 })).src));
+// В мозаике последняя остановка показывает не больше 9 работ: новые проекты добавляются в начало `projects.ts`, старые выпадают сами, сетка остаётся 3 на 3.
+const MOSAIC_MAX = 9;
+const mosaic = await Promise.all(projects.slice(0, MOSAIC_MAX).map(async project => (await getImage({ src: project.image, width: 480, format: 'webp', quality: 60 })).src));
+// Сетка мозаики подбирается под число показанных работ (при 9 и больше это всегда 3 на 3, при меньшем числе меньше пустых клеток).
+const mosaicGrid = [2, 3, 4, 5, 6].map(cols => { const rows = Math.ceil(mosaic.length / cols); return { cols, rows, score: (cols * rows - mosaic.length) * 10 + Math.abs(cols / rows - 1.6) }; }).sort((a, b) => a.score - b.score)[0] ?? { cols: 4, rows: 2 };
 const ring = await Promise.all(shown.map(async project => ({ ...project, texture: (await getImage({ src: project.image, width: 1200, format: 'webp', quality: 72 })).src })));
 ---
 <section class="section wrap" id="projects" aria-labelledby="projects-heading">
@@ -37,7 +41,7 @@ const ring = await Promise.all(shown.map(async project => ({ ...project, texture
       </ol>
       <!-- Последняя остановка ленты: в том же виде, что проекты. Справа «экран» с превью всех работ, слева подпись. -->
       <div class="stage-end">
-        <a class="stage-end-frame" href="/projects/" tabindex="-1" aria-hidden="true">
+        <a class="stage-end-frame" href="/projects/" tabindex="-1" aria-hidden="true" style={`--cols:${mosaicGrid.cols};--rows:${mosaicGrid.rows}`}>
           {mosaic.map(src => <img src={src} alt="" loading="lazy" decoding="async" />)}
         </a>
       </div>
